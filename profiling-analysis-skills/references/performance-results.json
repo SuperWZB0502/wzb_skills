@@ -1,0 +1,52 @@
+{
+  "input_trace_bytes": 6718483372,
+  "sampled_ranks": 6,
+  "events": 1011762,
+  "measurements": [
+    {
+      "trial": "baseline_w2",
+      "workers": 2,
+      "seconds": 1518.02,
+      "cpu_seconds": 2541.004887,
+      "peak_tree_rss_GiB": 9.56414794921875,
+      "trace_opens": 18,
+      "workflow_status": "partial",
+      "speedup": 1.0
+    },
+    {
+      "trial": "optimized_w2",
+      "workers": 2,
+      "seconds": 1449.546,
+      "cpu_seconds": 2548.6658119999997,
+      "peak_tree_rss_GiB": 8.6883544921875,
+      "trace_opens": 6,
+      "workflow_status": "partial",
+      "speedup": 1.0472382387312993
+    },
+    {
+      "trial": "optimized_gc_w2",
+      "workers": 2,
+      "seconds": 1372.489,
+      "cpu_seconds": 2405.0622240000002,
+      "peak_tree_rss_GiB": 10.78310775756836,
+      "trace_opens": 6,
+      "workflow_status": "partial",
+      "speedup": 1.1060343653027456
+    },
+    {
+      "trial": "optimized_gc_w6",
+      "workers": 6,
+      "seconds": 671.949,
+      "cpu_seconds": 2404.5476909999998,
+      "peak_tree_rss_GiB": 24.704425811767578,
+      "trace_opens": 6,
+      "workflow_status": "partial",
+      "speedup": 2.2591297851473846
+    }
+  ],
+  "equivalence_checks": 60,
+  "equivalence_passed": true,
+  "browser_passed": true,
+  "default_budget_workers": 6,
+  "os_page_cache_reset": false
+}

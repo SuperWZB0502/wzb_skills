@@ -1,0 +1,30 @@
+{
+  "source_html_sha256": "60c566e1dc9d6bf6dd19cc6b69148b4093ba9075defd2678109e7c7fd76b464e",
+  "viewport": {
+    "width": 1600,
+    "height": 1250
+  },
+  "browser_version": "156.0.8078.4",
+  "screenshots": [
+    {
+      "file": "overview.png",
+      "feature": "全局总览",
+      "mode": "时间表，秒",
+      "sha256": "710bdcdb5974fbf89864b6bb1a2a0968d5654842217dee4ab50ed0ecf8c84840"
+    },
+    {
+      "file": "parallel.png",
+      "feature": "5D并行通信图",
+      "streams": [
+        "compute",
+        "communication"
+      ],
+      "domains": [
+        "PP",
+        "GLOBAL"
+      ],
+      "sha256": "6228c42f401a0b9ded2a936144bdbe4e7dae45cc79a62d93ef08820b1b70d05c"
+    }
+  ],
+  "errors": []
+}

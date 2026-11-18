@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "sample": "5_8_36 / GBS3072 / 6 sampled Ranks / 1,011,762 events",
+  "runs_per_case": 3,
+  "browser": "156.0.8078.4",
+  "baseline_commit": "e5470f3",
+  "report_sha256": "506257b6c42aa5a5f3b5849196a2268a8b3f42bb247418f9c17542935d7bb988",
+  "medians": {
+    "baseline": {
+      "html_bytes": 55706413,
+      "ready_seconds": 7.947086796164513,
+      "js_heap_retained_bytes": 579393212,
+      "js_heap_sampled_peak_bytes": 633224716,
+      "renderer_rss_sampled_peak_bytes": 2304983040,
+      "renderer_rss_loading_peak_bytes": 2304983040,
+      "renderer_rss_at_ready_bytes": 869376000,
+      "interactions": {
+        "compute_toggle_seconds": 3.387099076062441,
+        "copy_toggle_seconds": 3.1298530232161283,
+        "free_toggle_seconds": 2.7762195598334074,
+        "zoom_wall_seconds": 2.857549110427499
+      }
+    },
+    "optimized": {
+      "html_bytes": 37021278,
+      "ready_seconds": 2.9938309472054243,
+      "js_heap_retained_bytes": 129930980,
+      "js_heap_sampled_peak_bytes": 175249968,
+      "renderer_rss_sampled_peak_bytes": 1030324224,
+      "renderer_rss_loading_peak_bytes": 861896704,
+      "renderer_rss_at_ready_bytes": 391184384,
+      "interactions": {
+        "compute_toggle_seconds": 1.1379041504114866,
+        "copy_toggle_seconds": 1.0379306562244892,
+        "free_toggle_seconds": 1.1541456952691078,
+        "zoom_wall_seconds": 1.1531235743314028
+      }
+    }
+  },
+  "validation": {
+    "main_events": 1011762,
+    "main_compute_refs": 510514,
+    "second_sample_events": 309349,
+    "second_sample_compute_refs": 148661,
+    "all_exact_roundtrips_passed": true,
+    "browser_numeric_time_mismatches": 0,
+    "pixel_identical_screenshots": 6,
+    "byte_identical_default_csv_pairs": 3,
+    "browser_errors": 0,
+    "external_requests": 0
+  },
+  "limits": [
+    "Warm OS cache was not cleared. Each run uses a new browser process.",
+    "RSS is sampled renderer process sum, including shared pages; JS heap excludes typed-array backing storage.",
+    "Loading, rendering, and backend profiling parse timings are different metrics.",
+    "Only the specified sample and second functional sample were measured; local browser/hardware results vary."
+  ]
+}

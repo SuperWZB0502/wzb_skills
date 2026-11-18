@@ -1,0 +1,4 @@
+interface:
+  display_name: "WZB Profiling 分析"
+  short_description: "解析 Ascend Profiling，生成全局总览和并行通信图的离线 HTML 报告"
+  default_prompt: "使用 $wzb-profiling-analysis 分析我提供的 Ascend profiling 目录并生成离线 HTML 报告。"

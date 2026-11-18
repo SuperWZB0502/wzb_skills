@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Web Office"
+  short_description: "Deploy and maintain a private multi-agent web office"
+  default_prompt: "Use $web-office-skills to deploy or maintain my personal Codex web workspace."

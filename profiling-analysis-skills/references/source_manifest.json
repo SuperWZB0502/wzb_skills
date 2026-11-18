@@ -1,0 +1,302 @@
+{
+  "schema_version": 2,
+  "updated_at": "2026-11-14T07:35:48.450716+00:00",
+  "description": "正式运行脚本、模板、JS及统一生成入口；不包含profiling或历史缓存。source为来源说明，不是运行时依赖。",
+  "files": [
+    {
+      "packaged": "scripts/assemble_report.py",
+      "source": "skill-local",
+      "sha256": "397262123b2a0ca65de689e70d9eba2f907290251bf0c94b0c19ed238308b989"
+    },
+    {
+      "packaged": "scripts/benchmark_html.py",
+      "source": "skill-local",
+      "sha256": "eb45bc6946db1dcd06a18254b976d1b4381fd65311bc08790af97937e8e07aac"
+    },
+    {
+      "packaged": "scripts/capture_previews.py",
+      "source": "skill-local",
+      "sha256": "e23c250e95b0842781ba122998d58f9df8f85a9d3773ce54239458474dfebef4"
+    },
+    {
+      "packaged": "scripts/features/overview/script/browser_check.py",
+      "source": "msinsight调研/功能01_每卡Step耗时统计/script/browser_check.py",
+      "sha256": "46d376aca52ce73ab7745adf0446b950a1d11c566aa26494638e6ded2aba2675"
+    },
+    {
+      "packaged": "scripts/features/overview/script/cluster_step_time.py",
+      "source": "msinsight调研/功能01_每卡Step耗时统计/script/cluster_step_time.py",
+      "sha256": "d6a08a2aa489c51daf093cb74caf05e379ce40f59cc2887b70832f68473c0a1f"
+    },
+    {
+      "packaged": "scripts/features/overview/script/global_overview.html",
+      "source": "msinsight调研/功能01_每卡Step耗时统计/script/global_overview.html",
+      "sha256": "f5e62afebeed9895c9ba6bd2bda8f6aa0b2e6e3f1b7376c08f457fadf109d7f7"
+    },
+    {
+      "packaged": "scripts/features/overview/script/global_overview.py",
+      "source": "msinsight调研/功能01_每卡Step耗时统计/script/global_overview.py",
+      "sha256": "87e35bb0d06332842dc1185a4d8c5eb5f5f44392d3d981df25909215714a1b72"
+    },
+    {
+      "packaged": "scripts/features/overview/script/overview_communication.py",
+      "source": "msinsight调研/功能01_每卡Step耗时统计/script/overview_communication.py",
+      "sha256": "797dc540065eaf701a60255fe6cf86cb51b4d988b7f43d04510c7ae0ec5cdbfa"
+    },
+    {
+      "packaged": "scripts/features/overview/script/overview_config.py",
+      "source": "msinsight调研/功能01_每卡Step耗时统计/script/overview_config.py",
+      "sha256": "e1256abf422ee7600a27a4a616e1da9c02f375faaf1aa92246bf555b0b4a1436"
+    },
+    {
+      "packaged": "scripts/features/overview/script/query_evidence.py",
+      "source": "msinsight调研/功能01_每卡Step耗时统计/script/query_evidence.py",
+      "sha256": "7b823a983e9056b2483b72c4ef4db92e772d77370d82cd9bd305a58d4b33b294"
+    },
+    {
+      "packaged": "scripts/features/overview/script/render_overview.py",
+      "source": "msinsight调研/功能01_每卡Step耗时统计/script/render_overview.py",
+      "sha256": "de8298d7025397fc8abb771382fa0793ea70cbefe7a711b308db4a04e5ca0651"
+    },
+    {
+      "packaged": "scripts/features/overview/script/run_overview.py",
+      "source": "msinsight调研/功能01_每卡Step耗时统计/script/run_overview.py",
+      "sha256": "f0759a5570d2342a539dfd062ab896f12f4bc9a9d616b4e6759bb21fdd5b3b3d"
+    },
+    {
+      "packaged": "scripts/features/overview/script/script_catalog.py",
+      "source": "msinsight调研/功能01_每卡Step耗时统计/script/script_catalog.py",
+      "sha256": "7063583150ee5c30d560f0e1b3c608a96a018da7d23184aec2b1867170adc733"
+    },
+    {
+      "packaged": "scripts/features/overview/script/validate_overview.py",
+      "source": "msinsight调研/功能01_每卡Step耗时统计/script/validate_overview.py",
+      "sha256": "da5d099ddcf21cee0d8c8f3084786a08db200e9851365f807a66bbcbdc5eb2aa"
+    },
+    {
+      "packaged": "scripts/features/overview/script/workflow_support.py",
+      "source": "msinsight调研/功能01_每卡Step耗时统计/script/workflow_support.py",
+      "sha256": "7a2993baeda4bd5392265f0fd352805ccacb9daea538e416878e7b3c394d4ea8"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/browser_check.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/browser_check.py",
+      "sha256": "96cc651d35df16fa833a923b6b770b2447befd42d8e4db8aa102300be14eaae4"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/compact_timeline.js",
+      "source": "msinsight调研/功能02_5D并行通信图/script/compact_timeline.js",
+      "sha256": "1f0f0e8a99155fafff891d2c73e2386b9422dcdc45193f2ab277d1e88c90c11e"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/compact_timeline.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/compact_timeline.py",
+      "sha256": "16c03f22f7e82fbe60fd0da47a673f914ab92c9b26683706c736049ee7fc248e"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/detail_panels.js",
+      "source": "msinsight调研/功能02_5D并行通信图/script/detail_panels.js",
+      "sha256": "11d6764b30d86a92514647b656005bd5021c78b82fab3fae35457faf639dcdd7"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/domain_trace.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/domain_trace.py",
+      "sha256": "579f7c673d218008da4df94e0789e2d803309649d0a5026562147c1e15fed030"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/fast_json.py",
+      "source": "skill-local",
+      "sha256": "12289bc8165a95d0f47258ba60a1aeb403fe5171dd7b6a3b5f374cec0649862a"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/free_boundaries.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/free_boundaries.py",
+      "sha256": "fe417bdefe07fbdb382f59a4454668e030ea3f20fbd470c32bc46ee0a2fc4411"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/global_communication.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/global_communication.py",
+      "sha256": "29d3ad4f5339ba8a87a187fbba797f9b32da79ba9e77fcf1a14f114562a38978"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/mindspeed_domains.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/mindspeed_domains.py",
+      "sha256": "8b71d1b676b7c7860db797fe86e23416ba14582d9110a8327ca01b4bbd7e8dd9"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/operator_details.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/operator_details.py",
+      "sha256": "4cb8d82fa7fd37136f00f93a73cee155ddd027e21d0b6f24af5b0280ab46e7a2"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/operator_performance.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/operator_performance.py",
+      "sha256": "2b43b1bc886da99ed56726637c855fdf951588acd76d7b75690baac1a94ce7f5"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/parallel_domain_registry.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/parallel_domain_registry.py",
+      "sha256": "0f02ea1a3b42e3dbe7939fcaa0acc513c3a14d002890dc6ec09a8971d74d1dd8"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/parallel_domain_split.html",
+      "source": "msinsight调研/功能02_5D并行通信图/script/parallel_domain_split.html",
+      "sha256": "9885e2a49ecd63c6e4d21f5e12a0773ec19025e6411c15343ed2519de217f7b4"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/parallel_domain_split.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/parallel_domain_split.py",
+      "sha256": "2673300f014a009217c38d2a9f943d25148e45da40b8f63211e91787fce7e0c9"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/parallel_domains.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/parallel_domains.py",
+      "sha256": "173e8d41e982b534ef0c83d4953fa2b42a0f7e13ae3d66c0a252ee09a4b2bb89"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/parallel_timeline.html",
+      "source": "msinsight调研/功能02_5D并行通信图/script/parallel_timeline.html",
+      "sha256": "87298df43878fd199e74b4fdedf1bef854f5d3cafd7e8ce64952a11e8d7d264e"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/parallel_workers.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/parallel_workers.py",
+      "sha256": "c5b9172dc5e5cc3b3815c03c4410eb62da1185dfa869c6e210a0cd6128f4f96f"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/phase_markers.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/phase_markers.py",
+      "sha256": "82f2e0f07a9c90fef2f3e3ed564432c74ea330c84723348e8dd054d7853fccba"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/pp_enrichment.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/pp_enrichment.py",
+      "sha256": "171514441556253553b3e80856ccdf90defa4d843bba319be1c74a1b7c2f60d3"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/pp_flow.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/pp_flow.py",
+      "sha256": "cb27d92e9c7f0eb5056fb88f4598ea4cbe552e14e278c40f8586c04aab69fd75"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/presentation_summary.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/presentation_summary.py",
+      "sha256": "2bc157d133d7fa0671b450ef3a1043fbc557801458e8c08af0a2309bf92a21d2"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/query_evidence.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/query_evidence.py",
+      "sha256": "0d6379d76b37389c206566ec404b2f1f830d357b798dade9008f476fea9ac839"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/refresh_domains.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/refresh_domains.py",
+      "sha256": "0324b4324dc30fd7666ce4ec347de15e6336f209e529c5b5d430564060414837"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/render_parallel.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/render_parallel.py",
+      "sha256": "23c1fb80896410f6b747b86e28f2cca6a71019bbe3e893b1a0535e4d3466b3a6"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/run_parallel.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/run_parallel.py",
+      "sha256": "6ac28136607841c5fbc51c1dc7afd38cebdf1dcf053527f0af164f97461a905e"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/script_catalog.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/script_catalog.py",
+      "sha256": "005ba3f4801fd29bd8a593f94506c09af6e6a11e8351a8ad61c4e22f378f1a02"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/timeline_colors.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/timeline_colors.py",
+      "sha256": "8568bbd1f88668369556a6d3dcb199fbb93a67fb150acddaff0fe6a86a1cbb1f"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/timeline_payload.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/timeline_payload.py",
+      "sha256": "2d808a8e33165e3996f1fae0acc69b939fb8d33000913d900e6f84c686f84233"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/timeline_streams.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/timeline_streams.py",
+      "sha256": "932f7682a4c1cb9af158d00d10a55315225fd3e0428a417b86f89d3eda4baa54"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/timeline_streams_tlv.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/timeline_streams_tlv.py",
+      "sha256": "552e43028433957aae28887abeea9a0af6c02f48d1dcb91d13539dae3f251b35"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/timeline_training.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/timeline_training.py",
+      "sha256": "e74a926d657100bbeff48fa4df99f7be5283e3bd51d0a963d57e052088fd2a85"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/unified_timeline.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/unified_timeline.py",
+      "sha256": "70ebbf7be99a63003d3e6c816d1d9a95027e46de90cd74a97222cf9f3a4c11ed"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/validate_html_payload.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/validate_html_payload.py",
+      "sha256": "fd150e27f67e353039bfc56bf61e72b6d2fa5389ae671c61a4833d103ffd524c"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/validate_operator_details.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/validate_operator_details.py",
+      "sha256": "06a86a8f5dab6d6c891194b1abe2c4d91f86ae4164f78067c2d5b6b2a0067aef"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/validate_parallel.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/validate_parallel.py",
+      "sha256": "8e03efb44f692921f1bed9f9853c506ac3d24033090ce7fe9359487de4abcbb8"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/verify_parallel_domains.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/verify_parallel_domains.py",
+      "sha256": "904b57e140ec4d27c0cf849ef3f9bc93615a05d66a20dedd08c13e9e3a414e96"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/verify_timeline_streams.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/verify_timeline_streams.py",
+      "sha256": "fffa00cddaa63eb52dd8a3cc2e644d9e3835f3a882d0a28fc8da74f7f096fa46"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/workflow_support.py",
+      "source": "msinsight调研/功能02_5D并行通信图/script/workflow_support.py",
+      "sha256": "4a31de192daf746a1fb2c552ae410ee7a23297635898a20a02568f17315759dd"
+    },
+    {
+      "packaged": "scripts/ingest_trace.py",
+      "source": "skill-local",
+      "sha256": "0156d05ab635fd814f1ad721782e59682cd30608b07220f14e824a63ffd820cb"
+    },
+    {
+      "packaged": "scripts/query_evidence.py",
+      "source": "skill-local",
+      "sha256": "07205636b08520b172976c8896051097c481a4a775092ad70d7cdb3fc63e3c5c"
+    },
+    {
+      "packaged": "scripts/requirements.txt",
+      "source": "skill-local",
+      "sha256": "1d97a85938c248f4ce6a06105afd48c86ac394043c6a0da8860e1001ca0a1d39"
+    },
+    {
+      "packaged": "scripts/run_analysis.py",
+      "source": "skill-local",
+      "sha256": "b853fe7a9bc16676e333ecd83a6f745f0ac3102fa8485a008693adec5ddcc2f7"
+    },
+    {
+      "packaged": "scripts/verify_package.py",
+      "source": "skill-local",
+      "sha256": "a613e94026aa5af6420a29b8d18f4823b246d87a10ca7cee95afe987fd926b40"
+    },
+    {
+      "packaged": "scripts/worker_budget.py",
+      "source": "skill-local",
+      "sha256": "a4366a93ccdd9e92b4e7cf823be378dbac983aaca92b308aa6cbd2c8c30cb13c"
+    }
+  ]
+}
