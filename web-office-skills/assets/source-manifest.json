@@ -5,7 +5,7 @@
   "upstreamCommit": "66a24ea7df2435ef897c48c147deb7ec572c01c2",
   "sourceCommit": null,
   "sourceDirty": null,
-  "sha256": "426f5a0b56385f9d1a8096da0c20fc4ba0b9d108a9e0abedc2d89abc576627e0",
+  "sha256": "9627e49dd4c1343977a2a5ecbfb1a93ff30f19e342c907e8465c8294966acf09",
   "files": {
     "app/chat.html": "e50d4436ef383faff9619ca181d1a472ba482206b42eade9adc864ff57adf709",
     "app/index.html": "eb904c37777fd24d3bf3fdf0dd5146eef6f0868eb09abe2f6d00d35395754d06",
@@ -292,7 +292,7 @@
     "app/server/office/redactor.ts": "e0d91daf0f4cadeaedec149e2080d28a19aae6b19c4359fadc265403afcfcd57",
     "app/server/office/releases.ts": "13c8d56e20b897189300052c66168fac2dbc71ae93e2b48358477d28bed332de",
     "app/server/office/restart.ts": "f103ebd7626ac6c30f47d60999b4165b27e20ffedd801934e5748660dc78d52a",
-    "app/server/office/run-registry.ts": "ab2002cca45a0db92b436fe783e064eafe0a95dd248ae00fc40d9525826f1658",
+    "app/server/office/run-registry.ts": "dcc68f60e9e08660b2f1efec5c2da693eb73ee53c1b4739bfc35da250734f7c1",
     "app/server/office/runtime-host.ts": "c81cd88bc12195909a046dc0833e57049d69d2060a5200d0a3c6bb89bc2a400b",
     "app/server/office/safe-io.ts": "fb86e17ad498d9972770bd0dc3ab705babfa093c5e0d82103f629f92d6e1b191",
     "app/server/office/service-runtime.ts": "9a4891ed350c3c0a2250a33837c280122f2d3c4c869c11226b8cd4821558329c",
