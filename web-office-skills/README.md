@@ -54,7 +54,7 @@ Claude Code 单独提供 **1M 长上下文** 手动勾选项：有模型时才�
 
 ## 长期记忆、技能库与项目目录
 
-- **两级长期记忆**：`company/rules.md` 是全员规章；每个员工还有 `agents/<id>/profile/memory.md`（受管规章区块 + 角色资源 + 自己维护的约定），每次运行自动注入（上限 6000 字符）。改规章后下一次运行自动同步，不用重启。开发岗额外注入 `company/dev-work-layout.md` 的项目目录规范。
+- **两级长期记忆**：`company/rules.md` 是全员规章；每个员工还有 `agents/<id>/profile/memory.md`（受管规章区块 + 角色资源 + 自己维护的约定），每次运行自动注入（上限 6000 字符）。改规章后下一次运行自动同步；`docs/dev-work-layout.md` 按需读取，不注入全文。
 - **技能库**：`skills/` 遵循 Anthropic Agent Skills 规范、按方向分类（`skills/<方向>/<技能>/SKILL.md`）；agent 用 `office_list_skills` 查看、`office_read_skill` 读取（支持“方向/技能名”）。改完执行 `node app/scripts/skills-index.mjs <根>` 更新索引。
 - **项目目录（开发岗）**：`work/<编号-项目>/` 下分 `code/`（独立 git 仓库）、`test/`（实验中间产物，不进 git）、`feature/`（设计/实现/测试文档）；特性最多两级，提交以主特性为最小粒度。用 `node app/scripts/work-layout.mjs` 生成骨架并检查。
 - **备份**：`node scripts/office.mjs backup --root <根> [--keep 7]` 生成 `artifacts/backups/*.tar.gz`（SQLite 在线快照 + 原生会话 + agents/projects/skills），服务进程内每 24 小时自动备份；`/healthz` 会返回 `backup.at/ok` 与执行器状态。

@@ -122,6 +122,8 @@ export async function verifyDelivery({
     files = verifySource(archive, manifest);
   for (const name of requiredFiles)
     if (!files.has(name)) throw Error("required_source_component_missing");
+  if (!files.has("docs/dev-work-layout.md") && !files.has("company/dev-work-layout.md"))
+    throw Error("required_source_component_missing");
   const sprites = [...files.keys()].filter((name) =>
     /^app\/public\/sprites\/.+\.png$/.test(name),
   );

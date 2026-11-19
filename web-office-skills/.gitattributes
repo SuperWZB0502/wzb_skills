@@ -1,0 +1,7 @@
+/*.md text eol=lf
+/agents/*.yaml text eol=lf
+/assets/*.md text eol=lf
+/assets/*.json text eol=lf
+/assets/*.tar.gz binary
+/references/*.md text eol=lf
+/scripts/*.mjs text eol=lf

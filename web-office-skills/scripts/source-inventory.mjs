@@ -26,6 +26,7 @@ export function isDistributableSourcePath(name) {
   if (/^app\/(?:src|server|shared|public)\/.+/.test(name)) return true;
   if (name.startsWith("app/") && appRoot.test(name.slice(4))) return true;
   if (/^company\/[A-Za-z0-9._-]+\.md$/.test(name)) return true;
+  if (name === "docs/dev-work-layout.md") return true;
   if (name === "VERSION") return true;
   return /^(?:scripts\/office\.mjs|restart-office\.sh|skills\/web-office-skills\/(?:scripts\/[^/]+\.mjs|references\/[^/]+\.md|agents\/openai\.yaml|assets\/THIRD_PARTY_NOTICES\.md|SKILL\.md|README\.md))$/.test(
     name,
@@ -64,6 +65,9 @@ export async function collectOfficeSource(workspaceRoot, { skillDirectory } = {}
   await walk("scripts/office.mjs");
   await walk("restart-office.sh");
   await walk("company");
+  await walk("docs/dev-work-layout.md").catch((error) => {
+    if (error.code !== "ENOENT" && error.message !== "managed_path_missing") throw error;
+  });
   await walk("VERSION");
   if (!skillDirectory) {
     for (const relative of [

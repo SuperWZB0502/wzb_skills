@@ -115,6 +115,9 @@ export async function atomicWrite(root, input, data) {
     );
     try {
       await directory.sync();
+    } catch (error) {
+      if (process.platform !== "win32" || error.code !== "EPERM" || error.syscall !== "fsync")
+        throw error;
     } finally {
       await directory.close();
     }

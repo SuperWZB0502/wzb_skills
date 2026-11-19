@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { constants } from "node:fs";
 import {
+  copyFile,
   mkdir,
   readFile,
   writeFile,
@@ -56,15 +58,20 @@ export async function install({
   const check = await doctor({ workspaceRoot, port });
   if (!check.ok) throw Error(check.failures.join("; "));
   const root = check.workspaceRoot;
-  for (const name of ["app", "scripts", "workspace.json", "skills", "restart-office.sh", "company", "VERSION"])
-    if (await exists(path.join(root, name)))
-      throw Error(
-        `managed_path_already_exists: ${name}; use the update command for an existing installation`,
-      );
   const archive = await readFile(sourceArchive),
     manifestBytes = await readFile(sourceManifest),
     manifest = JSON.parse(manifestBytes);
   const files = verifySource(archive, manifest);
+  const managedDirectories = ["app", "scripts", "skills", "company"];
+  const layoutDoc = "docs/dev-work-layout.md";
+  const installLayoutDoc = files.has(layoutDoc);
+  const managedPaths = [...managedDirectories, "workspace.json", "restart-office.sh", "VERSION"];
+  if (installLayoutDoc) managedPaths.push(layoutDoc);
+  for (const name of managedPaths)
+    if (await exists(path.join(root, name)))
+      throw Error(
+        `managed_path_already_exists: ${name}; use the update command for an existing installation`,
+      );
   for (const name of ["cache", "tmp", ".install-staging"]) {
     const dest = path.join(root, name);
     await mkdir(dest, { recursive: true, mode: 0o700 });
@@ -111,10 +118,22 @@ export async function install({
       inspectRuntime: false,
     });
     await rename(built.outDirectory, path.join(app, "dist-office"));
-    for (const name of ["app", "scripts", "skills", "company"]) {
+    for (const name of managedDirectories) {
       if (!(await exists(path.join(stage, name)))) continue;
       await rename(path.join(stage, name), path.join(root, name));
       activated.push(name);
+    }
+    if (installLayoutDoc) {
+      const docs = path.join(root, "docs");
+      if (await exists(docs)) {
+        if (!(await lstat(docs)).isDirectory() || (await realpath(docs)) !== docs)
+          throw Error("workspace_symlink_not_allowed");
+        await copyFile(path.join(stage, layoutDoc), path.join(root, layoutDoc), constants.COPYFILE_EXCL);
+        activated.push(layoutDoc);
+      } else {
+        await rename(path.join(stage, "docs"), docs);
+        activated.push("docs");
+      }
     }
     await rename(path.join(stage, "restart-office.sh"), path.join(root, "restart-office.sh"));
     activated.push("restart-office.sh");

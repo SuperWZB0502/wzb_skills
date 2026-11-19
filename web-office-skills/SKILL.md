@@ -38,7 +38,7 @@ Key/OAuth 只在运行期内存，停止/重启需重新提供或授权；浏览
 
 ## 长期记忆、技能与项目目录
 
-- 安装后工作根会有 `company/rules.md`（全员规章）与 `company/dev-work-layout.md`（开发岗项目规范）；每个员工首次运行时生成 `agents/<id>/profile/memory.md`，每次运行自动注入并随规章变更同步，不需要改代码或重启。
+- 安装后工作根会有 `company/rules.md`（全员规章）与 `docs/dev-work-layout.md`（项目详细规范）。规章随员工长期记忆注入；详细规范在创建目录、设置开关、定稿、提交或打包前按需读取。
 - 技能库 `skills/` 按 Anthropic 规范组织（方向目录 + SKILL.md）；agent 用 `office_list_skills` / `office_read_skill` 读取，改完跑 `node app/scripts/skills-index.mjs`。
 - 开发岗用 `node app/scripts/work-layout.mjs` 生成 `work/<编号-项目>/{code,test,feature}` 骨架；提交以主特性为最小粒度（代码 + 拼接的《特性文档.md》）。
 - 备份与迁移：`office.mjs backup`、`office.mjs migrate-layout`；Codex 旧线程路径修复用 `app/scripts/office-repair-codex-paths.mjs`。
