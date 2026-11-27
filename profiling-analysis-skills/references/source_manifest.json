@@ -56,7 +56,7 @@
     {
       "packaged": "scripts/features/overview/script/global_overview.html",
       "source": "msinsight调研/功能01_每卡Step耗时统计/script/global_overview.html",
-      "sha256": "f266055a6aa943fe89932798e5110cee549fb68e6e283aa678635df180e2534c"
+      "sha256": "d48176fb7edfbf664e752483ed93fba9c46eed76be0b0e66bbb32e7babdd46a5"
     },
     {
       "packaged": "scripts/features/overview/script/global_overview.py",
@@ -186,7 +186,7 @@
     {
       "packaged": "scripts/features/parallel/script/parallel_timeline.html",
       "source": "msinsight调研/功能02_5D并行通信图/script/parallel_timeline.html",
-      "sha256": "ce27783382a74a51b9a32794ec9f5ffa4cbb4da171df0d1aa725727245b404d8"
+      "sha256": "434383614b0f640c2366847d0c0d8572e1b158d2fd96fe9416a249e78ad97df1"
     },
     {
       "packaged": "scripts/features/parallel/script/parallel_workers.py",

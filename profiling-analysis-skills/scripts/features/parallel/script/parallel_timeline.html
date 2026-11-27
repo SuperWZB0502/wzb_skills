@@ -45,11 +45,31 @@
 .pps .table-name-combo [data-pp=table-prefix-options]{min-width:0}
 .pps .table-name-combo [data-pp=table-prefix-options] label{white-space:normal;overflow-wrap:anywhere}
 .pps .table-name-combo [data-pp=table-prefix-options] input{width:auto;flex:none;accent-color:var(--accent)}
+.pps .filter-hint-anchor{position:relative;height:0}
+.pps .filter-hint{--filter-hint-slide:4px;position:absolute;top:24px;right:calc(100% + 6px);display:flex;flex-direction:column-reverse;align-items:center;gap:3px;width:18px;color:var(--accent);font-size:13px;font-weight:650;line-height:1;white-space:nowrap;pointer-events:none}
+.pps .filter-hint-label{writing-mode:vertical-rl}
+.pps .filter-hint-hand{font:18px/1 "Segoe UI Symbol",system-ui,sans-serif}
+@media(prefers-reduced-motion:no-preference){
+ .pps .filter-hint{animation:timeline-filter-point 1.35s ease-in-out infinite}
+}
+@keyframes timeline-filter-point{
+ 0%,100%{transform:translateX(0)}
+ 45%,60%{transform:translateX(var(--filter-hint-slide))}
+}
+@media(max-width:700px){
+ .pps .filter-hint{--filter-hint-slide:1.5px;right:calc(100% + 2px);width:12px;line-height:12px}
+ .pps .filter-hint-hand{font-size:13px}
+}
+@media(min-width:1800px){
+ .pps:not(.is-fullscreen) .filter-hint{--filter-hint-slide:8px;right:calc(100% + 10px);flex-direction:row;width:max-content;gap:5px}
+ .pps:not(.is-fullscreen) .filter-hint-label{writing-mode:horizontal-tb}
+}
 </style>
 <div class="eyebrow">功能 02 · 5D PARALLEL TIMELINE</div>
 <div class="title-bar"><h2 data-pp="title">训练并行时间轴</h2><button class="primary" data-pp="fullscreen" aria-pressed="false">全屏查看</button></div>
 <p class="note" data-pp="loading" role="status">正在读取图表数据…</p>
 <div class="stats" data-pp="stats"><div class="stat domain-stat"><span>当前通信域</span><strong data-pp="group-label"></strong></div></div>
+<div class="filter-hint-anchor"><div class="filter-hint" hidden><span class="filter-hint-label">本行筛选</span><span class="filter-hint-hand" aria-hidden="true">&#9758;</span></div></div>
 <div class="card">
  <div class="toolbar filter-toolbar">
   <label>Step <select data-pp="step" aria-label="Step"></select></label>
@@ -428,6 +448,23 @@ q('copy-location').addEventListener('click',async()=>{if(!locationInfo)return;co
 function csvCell(value){const text=String(value??'');return /[",\r\n]/.test(text)?'"'+text.replace(/"/g,'""')+'"':text;}
 q('download').addEventListener('click',()=>{const unit=q('unit').value,headers=['Stage','卡号','事件类型','通信域','通信组','事件名称','起始('+unit+')','持续('+unit+')','结束('+unit+')',...metadataColumns.map(c=>c[1]),'绝对起始(μs)','调用栈状态'],rows=visible.map(e=>[stageOf(e.rank),e.rank,kindNames[e.kind],eventDomain(e),groupLabel(groupMap.get(String(e.group_id))),e.name,...['start_us','duration_us','end_us'].map(key=>(Number(e[key])/scales[unit]).toFixed(2)),...metadataColumns.map(([key])=>metadataColumnValue(e,key)),e.absolute_start_us,e.stack_status||'未确认']),content='\uFEFF'+[headers,...rows].map(row=>row.map(csvCell).join(',')).join('\r\n'),url=URL.createObjectURL(new Blob([content],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='parallel_timeline_step_'+q('step').value+'_'+unit+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 let resizeFrame;new ResizeObserver(()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>makeScene());}).observe(scroll);initializeGuides();initializeControls();render(true);root.dataset.ready='true';if(globalThis.__MSINSIGHT_BENCHMARK__)globalThis.__MSINSIGHT_DATA__={data,operatorDetails,computeRefFor,choose,chooseCompute,render,eventPerformance};q('loading').hidden=true;
+ function watchFilterHints(){
+  const page=document.documentElement;
+  if(page.hasAttribute('data-filter-hints-watching'))return;
+  page.setAttribute('data-filter-hints-watching','');
+  const hints=document.querySelectorAll('#rank-step-time .filter-hint, #pp-schedule .filter-hint');
+  const observer=new IntersectionObserver(entries=>{
+   if(!entries.some(entry=>entry.intersectionRatio>=.5))return;
+   observer.disconnect();
+   for(const hint of hints)hint.hidden=false;
+   setTimeout(()=>{for(const hint of hints)hint.hidden=true;},20000);
+  },{threshold:.5});
+  for(const section of document.querySelectorAll('#rank-step-time .toolbar, #pp-schedule .filter-toolbar')){
+   observer.observe(section.firstElementChild);
+  }
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watchFilterHints,{once:true});
+ else watchFilterHints();
 }catch(error){root.dataset.ready='error';const status=root.querySelector('[data-pp="loading"]');status.hidden=false;status.textContent='图表数据读取失败：'+(error?.message||String(error));console.error(error);}
 })();
 </script>

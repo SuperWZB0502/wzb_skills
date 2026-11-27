@@ -26,9 +26,30 @@
 .rst .stage-options input{width:auto;accent-color:var(--accent)}
 .rst .stage-actions{display:flex;gap:5px;margin-bottom:6px}
 .rst .stage-actions button{padding:2px 6px;color:var(--ink);background:#fff;border:1px solid #cfd9e2;border-radius:7px}
+.rst .filter-hint-anchor{position:relative;height:0}
+.rst .filter-hint{--filter-hint-slide:4px;position:absolute;top:24px;right:calc(100% + 6px);display:flex;flex-direction:column-reverse;align-items:center;gap:3px;width:18px;color:var(--accent);font-size:13px;font-weight:650;line-height:1;white-space:nowrap;pointer-events:none}
+.rst .filter-hint[hidden]{display:none}
+.rst .filter-hint-label{writing-mode:vertical-rl}
+.rst .filter-hint-hand{font:18px/1 "Segoe UI Symbol",system-ui,sans-serif}
+@media(prefers-reduced-motion:no-preference){
+ .rst .filter-hint{animation:overview-filter-point 1.35s ease-in-out infinite}
+}
+@keyframes overview-filter-point{
+ 0%,100%{transform:translateX(0)}
+ 45%,60%{transform:translateX(var(--filter-hint-slide))}
+}
+@media(max-width:700px){
+ .rst .filter-hint{--filter-hint-slide:1.5px;right:calc(100% + 2px);width:12px;line-height:12px}
+ .rst .filter-hint-hand{font-size:13px}
+}
+@media(min-width:1800px){
+ .rst .filter-hint{--filter-hint-slide:8px;right:calc(100% + 10px);flex-direction:row;width:max-content;gap:5px}
+ .rst .filter-hint-label{writing-mode:horizontal-tb}
+}
 </style>
 <div class="eyebrow">功能 01 · PROFILING</div><h1>全局总览</h1><p class="sub">按 Step 查看各流水线 Stage 的配置与耗时。点击表头排序，切换百分比查看时间占比。</p>
 <div class="summary" data-r="summary"></div>
+<div class="filter-hint-anchor"><div class="filter-hint" hidden><span class="filter-hint-label">本行筛选</span><span class="filter-hint-hand" aria-hidden="true">&#9758;</span></div></div>
 <div class="card"><div class="toolbar"><label>Step <select data-r="step" aria-label="Step"></select></label><div class="picker-field"><span>Stage</span><details class="stage-picker"><summary aria-label="Stage选择"><span data-r="stage-count"></span> ▾</summary><div class="stage-options"><div class="stage-actions"><button type="button" data-r="stage-all">全选</button><button type="button" data-r="stage-none">清空</button></div><div data-r="stage-options"></div></div></details></div><div class="picker-field"><span>卡号</span><details class="stage-picker"><summary aria-label="卡号选择"><span data-r="rank-count"></span> ▾</summary><div class="stage-options"><div class="stage-actions"><button type="button" data-r="rank-all">全选</button><button type="button" data-r="rank-none">清空</button></div><div data-r="rank-options"></div></div></details></div><label>单位 <select data-r="unit" aria-label="单位"><option value="s" selected>秒（s）</option><option value="ms">毫秒（ms）</option><option value="us">微秒（μs）</option></select></label><label class="mode"><input type="checkbox" role="switch" aria-label="百分比显示" data-r="percentage">百分比</label><button class="download" data-r="download">导出当前表格 CSV</button></div><div class="scroll"><table><caption>全局总览</caption><thead><tr data-r="headers"></tr></thead><tbody data-r="rows"></tbody></table></div><div class="footer"><span data-r="row-count"></span><span data-r="unit-note"></span></div></div>
 <p class="note"><b>端到端时间 = 计算 + 未掩盖通信 + Free。</b> 时间占比以当前行端到端时间为分母；层数、重计算与显存保持原值。<br><b>总通信 = 未掩盖通信 + 掩盖通信。</b> 掩盖通信与计算存在重叠，各时间项不能直接全部相加；“—”表示暂无数据。</p><noscript>请允许浏览器运行 JavaScript，或查看随报告导出的 CSV。</noscript>
 <script type="application/json" id="rank-step-time-data">__DATA__</script><script>
@@ -138,5 +159,22 @@ q('step').addEventListener('change',updateScope);
 const csvCell=value=>/[",\r\n]/.test(String(value))?'"'+String(value).replace(/"/g,'""')+'"':String(value);
 q('download').addEventListener('click',()=>{const content='\uFEFF'+[cols.map(label),...visible.map(row=>cols.map(col=>formatCell(row,col,true)))].map(row=>row.map(csvCell).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([content],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='overview_step_'+q('step').value.replace(/[^a-zA-Z0-9_-]/g,'_')+'_'+(q('percentage').checked?'percent':q('unit').value)+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 updateScope();
+function watchFilterHints(){
+ const page=document.documentElement;
+ if(page.hasAttribute('data-filter-hints-watching'))return;
+ page.setAttribute('data-filter-hints-watching','');
+ const hints=document.querySelectorAll('#rank-step-time .filter-hint, #pp-schedule .filter-hint');
+ const observer=new IntersectionObserver(entries=>{
+  if(!entries.some(entry=>entry.intersectionRatio>=.5))return;
+  observer.disconnect();
+  for(const hint of hints)hint.hidden=false;
+  setTimeout(()=>{for(const hint of hints)hint.hidden=true;},20000);
+ },{threshold:.5});
+ for(const section of document.querySelectorAll('#rank-step-time .toolbar, #pp-schedule .filter-toolbar')){
+  observer.observe(section.firstElementChild);
+ }
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watchFilterHints,{once:true});
+else watchFilterHints();
 })();
 </script></section>
