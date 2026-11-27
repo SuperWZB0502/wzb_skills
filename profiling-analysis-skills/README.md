@@ -1,6 +1,6 @@
 # WZB Profiling Analysis Skills
 
-将已导出的 Ascend / MindSpore / PyTorch TEXT profiling 生成一份离线交互 HTML，包含「全局总览」和「5D并行通信图」两个功能。无需将 profiling 下载到本地，也无需启动 msinsight 服务；在数据所在机器运行脚本，打开生成的 HTML 即可查看。
+将已导出的 Ascend / MindSpore / PyTorch TEXT profiling 生成一份离线交互 HTML，包含「全局总览」「训练并行时间轴」「算子详情」。在数据所在机器运行脚本即可生成 HTML。算子详情也支持单独读取兼容的 Ascend Profiling DB。
 
 数据识别、解析、统计、校验、页面渲染和最终拼装全部由随附 Python 脚本完成。Agent 首次使用只需执行命令、读取结果并提供报告链接；后续需要解释异常、改进功能或 debug 时，再使用 Agent 分析和修改源码。
 
@@ -20,25 +20,29 @@ HTML默认使用无损列式压缩与共享字典，保留算子、精确时间�
 
 适合回答：哪个 Stage 较慢？未掩盖通信占比有多高？各 Stage 的计算和通信是否均衡？
 
-## 功能二：5D并行通信图
+## 功能二：训练并行时间轴
 
 在统一时间轴上查看每个 Stage / Rank 的执行过程，将总览中的差异定位到时间区间和具体算子。
 
 ![5D并行通信图预览：计算流、通信流、调度标注和事件统计](assets/previews/parallel.png)
 
-- **多流对齐**：计算、通信、拷贝、Free 分行展示，便于观察重叠关系；预览图开启了计算和通信流，通信域为默认的 PP + GLOBAL。
+- **多流对齐**：计算、通信、拷贝、Free 分行展示，便于观察重叠关系。默认开启计算、通信、Free 和报告内有事件的通信域。
 - **通信域筛选**：支持 PP、DP、EP、CP、TP、GLOBAL，以及 TP-Extend-EP、DP-Modulo-EP、DP-With-CP、DP-With-CP-Modulo-EP；无法确认的事件保留为「未确认」。
 - **级联复选**：按 Stage、卡号、通信组、显示流、调度标注和通信域组合查看；支持名称搜索。
 - **调度过程**：按可验证证据显示前向 f、反向 b、逐层重计算 r 和 Adam 优化器更新 opt；查看通信方向及通信组成员。
 - **交互定位**：鼠标移入图后用 W / S 聚焦缩放、A / D 平移；普通框选筛选事件，Ctrl + 框选重组所选泳道与时间窗，Esc 恢复，支持全屏查看。
-- **算子详情**：悬停查看信息，单击后详情浮窗固定跟随色块，点击空白关闭。计算算子展示输入 / 输出 shape、dtype、format，以及有证据的 FLOPs / MFU；通信算子展示收发 Rank、通信量、传输 / 等待时间和带宽。
+- **算子详情**：悬停时预览信息，单击后在左下角查看和复制详情。悬停其他色块时，左下角仍保留已选详情。计算算子展示输入 / 输出 shape、dtype、format，以及有证据的 FLOPs / MFU；通信算子展示收发 Rank、通信量、传输 / 等待时间和带宽。
 - **统计与证据**：提供事件总览、事件明细、筛选、排序、分页和 CSV；框选或点击计算范围块可查看 FLOPs / MFU 汇总，支持复制时间区间和展开已有 Python 调用栈。
 
 适合回答：这段等待发生在哪张卡？计算与哪些通信重叠？这个算子的输入输出是什么？某段区间包含哪些事件？
 
+## 功能三：算子详情
+
+中文页面按卡查看计算算子、计算算子类型、通信算子和通信算子类型。耗时图和统计覆盖当前卡的完整结果，支持关键词搜索、排序、分页、组内展开和全量 CSV 下载。计算明细保留输入输出 Shapes、数据类型、格式和原始数据提供的 PMU 字段。
+
 ## 如何使用
 
-需要 Linux、Python 3.10+ 和 `ijson`。将 `SKILL_DIR` 设置为本目录的实际路径：
+需要 Python 3.10+ 和 `ijson`，支持 Linux 和 Windows。将 `SKILL_DIR` 设置为本目录的实际路径。
 
 ```bash
 python3 -m pip install -r "$SKILL_DIR/scripts/requirements.txt"
@@ -51,10 +55,12 @@ python3 "$SKILL_DIR/scripts/run_analysis.py" \
 
 | 文件 | 用途 |
 | --- | --- |
-| `analysis-result/report.html` | 两个功能合并的离线交互报告 |
+| `analysis-result/report.html` | 本次成功功能合并的离线交互报告 |
 | `analysis-result/workflow.json` | 执行状态、统计、输出路径和耗时 |
 | `analysis-result/summary.md` | 结果摘要及数据限制 |
-| `analysis-result/overview/`、`parallel/` | 两个功能各自的数据、CSV、页面和缓存 |
+| `analysis-result/overview/`、`parallel/`、`operator/` | 各功能的数据、页面和缓存 |
+
+单独生成算子详情时，在统一命令中追加 `--features operator`。输入可以是 `kernel_details*.csv`、`op_summary*.csv`、兼容的 Ascend Profiling DB 或包含这些文件的导出目录。
 
 输入支持任务目录、profiling 目录、单卡采集目录或 `ASCEND_PROFILER_OUTPUT`。首次完整分析默认一次扫描，并按CPU、可用内存和实采卡数自动选择并发（最多8），也可以用`--workers N`手动指定。首次扫描的耗时取决于数据规模；已有结果可用 `--render-only` 重生成页面，无需重新解析。用现代浏览器打开 HTML，无需网络资源。
 

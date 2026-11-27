@@ -11,6 +11,7 @@ import re
 D=Decimal
 GROUP=re.compile(r'^(?:\d+:)?Group (.+) Communication$')
 PHASE=re.compile(r'(?:^|/)pipeline_parallel/schedules\.py\(\d+\):(forward_step|backward_step)$')
+PROFILE_PHASE={'hy106.phase.fwd':'f','hy106.phase.bwd':'b'}
 INVALID_RANK=2**32-1
 COLLECTIVE=re.compile(r'(?:allreduce|allgather|reducescatter|alltoall|broadcast|barrier|gather|scatter)$',re.I)
 
@@ -73,7 +74,8 @@ class Collector:
             return
         if ph!='X':return
         phase=PHASE.search(name)
-        if phase:
+        profile_phase=PROFILE_PHASE.get(name) if event.get('cat')=='cpu_op' else None
+        if phase or profile_phase:
             span=_time(event)
             if span:
                 args=event.get('args') or {};micro=None
@@ -81,7 +83,8 @@ class Collector:
                     if re.sub('[^a-z0-9]','',str(key).lower()) in {'microbatchid','microbatch','microbatchindex','microid'}:
                         try:micro=int(value)
                         except (ValueError,TypeError):pass
-                self.phase_candidates.append({'kind':'f' if phase.group(1)=='forward_step' else 'b',
+                kind=profile_phase or ('f' if phase.group(1)=='forward_step' else 'b')
+                self.phase_candidates.append({'kind':kind,
                     'absolute_start_us':str(span[0]),'duration_us':str(span[1]-span[0]),'source_name':name,
                     'source_ordinal':ordinal,'explicit_micro':micro})
         elif 'forward_backward_pipelining_without_interleaving' in name:
@@ -247,6 +250,39 @@ def add_transfers(report,cache):
     for event in report['events']:event['transfers']=list(evidence[event['event_id']].values())
 
 
+def add_profile_phases(report, cache, origin, regions, phase_stats):
+    """An explicit whole-step pair is independent of PP groups and microbatch IDs."""
+    for rank, raw in cache.items():
+        by_step=defaultdict(list)
+        for phase in raw.get('phases',[]):
+            if phase['source_name'] in PROFILE_PHASE and phase['step'] in report['steps']:
+                by_step[phase['step']].append(phase)
+        for step, values in by_step.items():
+            if len(values)!=2 or [p['kind'] for p in values]!=['f','b']:
+                continue
+            if any(r['rank']==rank and r['step']==step and r['phase'] in ('f','b') for r in regions):
+                continue
+            forward, backward=values
+            if D(forward['absolute_start_us'])+D(forward['duration_us'])>D(backward['absolute_start_us']):
+                continue
+            phase_stats[f'{rank}:{step}']={'f':1,'b':1}
+            compute=merge(raw.get('compute_ranges',[]))
+            for phase in values:
+                begin=D(phase['absolute_start_us']);end=begin+D(phase['duration_us'])
+                kind=phase['kind']
+                segments=intersection(compute,begin,end)
+                regions.append({'region_id':f'profile-phase:{rank}:{step}:{kind}','group_id':None,
+                    'rank':rank,'stage':None,'step':step,'micro':None,'phase':kind,'label':'1'+kind,
+                    'start_us':str(begin-origin),'end_us':str(end-origin),
+                    'display_start_us':str(begin-origin),'display_end_us':str(end-origin),
+                    'display_basis':'显式采集区间',
+                    'segments':[{'start_us':str(a-origin),'end_us':str(b-origin)} for a,b in segments],
+                    'duration_us':str(sum((b-a for a,b in segments),D(0))),
+                    'framework_start_us':str(begin-origin),'framework_end_us':str(end-origin),
+                    'source_name':phase['source_name'],'source_ordinal':phase['source_ordinal'],
+                    'basis':'整步内唯一显式前向、反向阶段；1 表示该阶段首次出现。'})
+
+
 def enrich_report(report,ranks):
     origin=D(report['time_origin_us']);regions=[];warnings=[];phase_stats={}
     expected_mbn=report.get('micro_configuration',{}).get('expected_mbn')
@@ -304,6 +340,7 @@ def enrich_report(report,ranks):
                         'framework_start_us':str(begin-origin),'framework_end_us':str(end-origin),
                         'source_name':phase.get('source_name'),'source_ordinal':phase.get('source_ordinal'),
                         'basis':'device_compute ∩ framework_phase − selected_group_communication；'+basis})
+    add_profile_phases(report,cache,origin,regions,phase_stats)
     report['compute_regions']=regions;report['enrichment_warnings']=sorted(set(warnings))
     report['enrichment_stats']={'compute_regions':len(regions),'compute_segments':sum(len(r['segments']) for r in regions),
        'events_with_directions':sum(bool(e['transfers']) for e in report['events']),

@@ -8,7 +8,8 @@ import sys,time
 from workflow_support import (InputProblem,Progress,normalize_input,input_states,default_output,load_json,write_json,
     digest,code_key,outputs_state,outputs_match,lock_file,write_delivery,capture_logs,finish_action,ensure_output_paths)
 FEATURE=Path(__file__).resolve().parents[1]
-CORE=['cluster_step_time.py','overview_config.py','overview_communication.py','global_overview.py','run_overview.py']
+CORE=['cluster_step_time.py','overview_config.py','overview_communication.py','global_overview.py','run_overview.py',
+      '../../../training_log.py']
 
 def capabilities(report,probe):
     summary=report['overview']['summary'];rows=[r for rows in report['steps'].values() for r in rows]
@@ -90,8 +91,8 @@ def run(argv=None):
                     for pattern in ('step_*.csv','overview_step_*_time.csv','overview_step_*_percent.csv'):
                         for old_csv in out.glob(pattern):old_csv.unlink()
                     for step,rows in data['steps'].items():
-                        (out/f'step_{step}.csv').write_text(csv_text(rows),encoding='utf-8-sig')
-                        for view in ('time','percent'):(out/f'overview_step_{step}_{view}.csv').write_text(overview_csv(data,step,view),encoding='utf-8-sig')
+                        (out/f'step_{step}.csv').write_text(csv_text(rows),encoding='utf-8-sig',newline='')
+                        for view in ('time','percent'):(out/f'overview_step_{step}_{view}.csv').write_text(overview_csv(data,step,view),encoding='utf-8-sig',newline='')
                     for name,value in [('report',data),('configuration',config),('communication_breakdown',comm)]:write_json(out/(name+'.json'),value)
             validation=None
             if not a.skip_validation:

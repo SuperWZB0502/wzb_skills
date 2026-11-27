@@ -1,6 +1,10 @@
 """Small, independent log/metadata guard for sequential micro numbering."""
 from pathlib import Path
 import re
+import sys
+
+sys.path.append(str(Path(__file__).resolve().parents[3]))
+from training_log import mesh_training_arguments
 
 ARGUMENT = re.compile(r'^\s{2}(\w+)\s+\.{2,}\s+(.*?)\s*$')
 
@@ -21,7 +25,12 @@ def micro_configuration(profiling, ranks, log_dir=None):
     for row in ranks:
         value = row['metadata'].get('distributed_args', {}).get('data_parallel_size')
         if value is not None: values.setdefault('data_parallel_size', set()).add(str(value))
-    result = {'expected_mbn': None, 'sources': sources, 'warnings': warnings}
+    mesh_args=mesh_training_arguments(Path(log_dir) if log_dir else Path(profiling).parent/'run_log')
+    for key,records in mesh_args.items():
+        if key in wanted:values.setdefault(key,set()).update(str(value) for value,_ in records)
+        sources.extend(source for _,source in records)
+    result = {'expected_mbn': None, 'sources': sources, 'warnings': warnings,
+              'mesh_args':{key:sorted({value for value,_ in records}) for key,records in mesh_args.items()}}
     if any(len(v) != 1 for v in values.values()):
         warnings.append('微批次数配置来源不一致，未使用配置推断micro编号。')
         return result

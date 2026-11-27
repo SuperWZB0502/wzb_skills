@@ -8,10 +8,15 @@
 python3 "$SKILL_DIR/scripts/run_analysis.py" --profiling /data/job/profiling --output-dir /data/reports/job
 python3 "$SKILL_DIR/scripts/run_analysis.py" --profiling /data/job --output-dir /data/reports/job --log-dir /data/job/run_log
 python3 "$SKILL_DIR/scripts/run_analysis.py" --output-dir /data/reports/job --render-only
+python3 "$SKILL_DIR/scripts/run_analysis.py" --output-dir /data/reports/job --render-only --browser-check
 python3 "$SKILL_DIR/scripts/run_analysis.py" --output-dir /data/reports/job --validate-only
 ```
 
-`--features overview|parallel|all`控制需要的功能。`--communication-only`仅影响功能2。`--step`限制采集Step；未提供时不硬编码。`--browser-check`对正常运行/重渲染增加可选浏览器验收，需要Playwright/Chromium：
+`--features overview|parallel|operator|all` 控制需要的功能。算子 CSV 或 Profiling DB 可用 `--features operator` 单独运行。`--communication-only` 仅影响功能2。`--step` 限制采集 Step，缺省使用全部 Step。`--browser-check` 对正常运行或重渲染增加可选浏览器验收，需要 Playwright 和浏览器。
+
+浏览器验收会核对功能2的默认选流及泳道，以及功能3的双饼图对齐、占比位置、`cube` 与 `vector` 同行和加速器核下拉联动。
+
+单设备平铺 TEXT 采集可以直接指定采集根目录或 `ASCEND_PROFILER_OUTPUT`。入口在输出目录的 `.input/` 准备分析输入副本，并记录文件状态和卡号依据。采集根目录的 `logs/` 会被发现；训练日志放在别处时，用 `--log-dir` 指定。汇总 HTML 可独立离线打开，显示路径由入口处理。
 
 ```bash
 python3 -m pip install playwright
@@ -26,10 +31,11 @@ python3 -m playwright install chromium
 
 ```text
 analysis-result/
-  report.html                  两功能统一离线HTML
+  .input/                      平铺导出适配后的输入副本和来源记录
+  report.html                  本次成功功能的合并离线 HTML
   workflow.json                Agent优先读取的聚合状态/统计/路径
   summary.md                   聚合摘要
-  overview.log / parallel.log  各入口控制台日志
+  overview.log / parallel.log / operator.log
   overview/
     report.html                  本功能独立页面
     workflow.json / summary.md / agent_tasks.json
@@ -45,6 +51,8 @@ analysis-result/
     phase_markers.json / free_boundaries.json
     operator_details.json / operator_details_validation.json
     presentation_summary.json / validation.json / analysis_manifest.json
+  operator/
+    report.html / report.json / workflow.json / summary.md
 ```
 
 缓存与载荷文件也在各功能输出中，不放进技能源目录。详细manifest保存输入/代码/产物指纹，正常无需读入Agent上下文。语义不完整的partial可以返回码0；统一入口非零返回表示至少一个所选功能执行失败。
@@ -80,6 +88,7 @@ python3 "$SKILL_DIR/scripts/query_evidence.py" --output-dir /data/reports/job --
 
 - `features/overview/script/run_overview.py`：全局总览完整流程。
 - `features/parallel/script/run_parallel.py`：并行图完整流程。
+- `features/operator/script/run_operator.py`：算子详情独立生成、重渲染和数据校验。
 - `render_overview.py` / `render_parallel.py`：读取已有JSON和模板生成HTML。
 - `operator_details.py`：从导出CSV/JSON重建详情侧文件；`validate_operator_details.py`核对全部引用。
 - `phase_markers.py`：从有效设备/框架缓存重建逐层r和Adam opt。

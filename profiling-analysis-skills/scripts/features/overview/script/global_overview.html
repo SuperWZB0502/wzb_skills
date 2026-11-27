@@ -4,13 +4,54 @@
 .rst .chip,.rst .chip:nth-child(n){background:#fff;border-color:var(--line)}.rst .chip,.rst .chip span,.rst .chip strong{color:var(--ink)}.rst th{color:var(--ink);font-size:14px;font-weight:650;font-family:inherit}.rst{--cell-hover:#f0f8f6;--cell-cross:#e9f4f1}.rst th.column-hover,.rst td.column-hover,.rst tr.row-hover>td{background-color:var(--cell-hover)}.rst tr.row-hover>td.column-hover{background-color:var(--cell-cross)}
 .rst tbody tr{--row-background:#fff}.rst tbody tr:nth-child(even){--row-background:#f8fafb}.rst tbody td,.rst tbody td:first-child{background-color:var(--row-background)}.rst tbody tr.row-hover>td,.rst tbody td.column-hover{background-color:var(--cell-hover)}.rst tbody tr.row-hover>td.column-hover{background-color:var(--cell-cross)}
 
-/* 页面水印：王振邦 w00910068。两个独立模板共用body伪元素，合并页面只绘制一层。 */
-body::after{content:"";position:fixed;inset:0;z-index:2147483646;pointer-events:none;user-select:none;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22680%22%20height%3D%22420%22%20viewBox%3D%220%200%20680%20420%22%3E%3Ctext%20x%3D%22340%22%20y%3D%22210%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%20transform%3D%22rotate%28-24%20340%20210%29%22%20fill%3D%22%23172538%22%20fill-opacity%3D%220.075%22%20font-family%3D%22system-ui%2CMicrosoft%20YaHei%2Csans-serif%22%20font-size%3D%2224%22%20font-weight%3D%22500%22%3E%E7%8E%8B%E6%8C%AF%E9%82%A6%20w00910068%3C%2Ftext%3E%3C%2Fsvg%3E");background-repeat:repeat;background-size:680px 420px}
+.rst .scroll table th,.rst .scroll table td{text-align:left}
+.rst .scroll table th{background:#f8fafb;color:var(--ink);font-size:14px;font-weight:650;cursor:pointer;padding:0}
+.rst .scroll table th:hover,.rst .scroll table th[aria-sort=ascending],.rst .scroll table th[aria-sort=descending]{background:var(--cell-hover)}
+.rst .scroll table th:not(:last-child)::after{content:"";position:absolute;right:0;top:25%;width:1px;height:50%;background:#d7dfe7;pointer-events:none}
+.rst .scroll table th button{display:flex;align-items:center;justify-content:space-between;gap:5px;width:100%;min-width:0;min-height:32px;padding:8px;color:inherit;text-align:left;line-height:18px;border:0;border-radius:0;background:transparent;font-weight:inherit}
+.rst .scroll table th button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.rst .scroll table th .sort-icon,.rst .scroll table th[aria-sort] .sort-icon{display:grid;place-content:center;gap:2px;flex:none;width:12px;margin:0;color:#798592}
+.rst .scroll table th .sort-icon::before,.rst .scroll table th .sort-icon::after{content:"";border-left:4px solid transparent;border-right:4px solid transparent}
+.rst .scroll table th .sort-icon::before{border-bottom:5px solid currentColor}
+.rst .scroll table th .sort-icon::after{border-top:5px solid currentColor}
+.rst .scroll table th[aria-sort=ascending] .sort-icon::before,.rst .scroll table th[aria-sort=descending] .sort-icon::after{color:var(--accent)}
+.rst .scroll table th:not(:first-child){position:relative}
+.rst .card{overflow:visible}
+.rst .picker-field{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+.rst .stage-picker{position:relative;margin:0}
+.rst .stage-picker summary{list-style:none;padding:6px 10px;color:var(--ink);background:#fff;border:1px solid #cfd9e2;border-radius:7px}
+.rst .stage-picker summary::-webkit-details-marker{display:none}
+.rst .stage-options{position:absolute;left:0;top:100%;z-index:5;width:max-content;min-width:170px;max-width:75vw;max-height:245px;overflow:auto;padding:10px;border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:0 6px 20px #17253820}
+.rst .stage-options label{padding:3px 0;cursor:pointer}
+.rst .stage-options input{width:auto;accent-color:var(--accent)}
+.rst .stage-actions{display:flex;gap:5px;margin-bottom:6px}
+.rst .stage-actions button{padding:2px 6px;color:var(--ink);background:#fff;border:1px solid #cfd9e2;border-radius:7px}
+.rst .filter-hint-anchor{position:relative;height:0}
+.rst .filter-hint{--filter-hint-slide:4px;position:absolute;top:24px;right:calc(100% + 6px);display:flex;flex-direction:column-reverse;align-items:center;gap:3px;width:18px;color:var(--accent);font-size:13px;font-weight:650;line-height:1;white-space:nowrap;pointer-events:none}
+.rst .filter-hint[hidden]{display:none}
+.rst .filter-hint-label{writing-mode:vertical-rl}
+.rst .filter-hint-hand{font:18px/1 "Segoe UI Symbol",system-ui,sans-serif}
+@media(prefers-reduced-motion:no-preference){
+ .rst .filter-hint{animation:overview-filter-point 1.35s ease-in-out infinite}
+}
+@keyframes overview-filter-point{
+ 0%,100%{transform:translateX(0)}
+ 45%,60%{transform:translateX(var(--filter-hint-slide))}
+}
+@media(max-width:700px){
+ .rst .filter-hint{--filter-hint-slide:1.5px;right:calc(100% + 2px);width:12px;line-height:12px}
+ .rst .filter-hint-hand{font-size:13px}
+}
+@media(min-width:1800px){
+ .rst .filter-hint{--filter-hint-slide:8px;right:calc(100% + 10px);flex-direction:row;width:max-content;gap:5px}
+ .rst .filter-hint-label{writing-mode:horizontal-tb}
+}
 </style>
 <div class="eyebrow">功能 01 · PROFILING</div><h1>全局总览</h1><p class="sub">按 Step 查看各流水线 Stage 的配置与耗时。点击表头排序，切换百分比查看时间占比。</p>
 <div class="summary" data-r="summary"></div>
-<div class="card"><div class="toolbar"><label>Step <select data-r="step" aria-label="Step"></select></label><label>时间单位 <select data-r="unit" aria-label="时间单位"><option value="s" selected>秒（s）</option><option value="ms">毫秒（ms）</option><option value="us">微秒（μs）</option></select></label><label class="mode"><input type="checkbox" role="switch" aria-label="百分比显示" data-r="percentage">百分比</label><label>搜索 Stage / 卡号 <input data-r="search" aria-label="搜索 Stage / 卡号" placeholder="例如 stage:0 或 rank:16"></label><button class="download" data-r="download">导出当前表格 CSV</button></div><div class="scroll"><table><caption>全局总览</caption><thead><tr data-r="headers"></tr></thead><tbody data-r="rows"></tbody></table></div><div class="footer"><span data-r="row-count"></span><span data-r="unit-note"></span></div></div>
-<p class="note"><b>端到端时间 = 计算 + 未掩盖通信 + Free。</b> 时间占比以当前行端到端时间为分母；层数、重计算与显存保持原值。<br><b>总通信 = 未掩盖通信 + 掩盖通信。</b> 掩盖通信与计算存在重叠，各时间项不能直接全部相加；“—”表示暂无数据。</p><details><summary>数据来源与统计口径</summary><p>每行保留一张实际采集卡，Stage 单元格可查看原始卡号及流水线分组。时间与百分比均保留两位小数，导出跟随当前显示模式。分母为零时占比显示“—”。显存单位为 GiB，其采集范围以来源说明为准。bubble = PP + Grad AR；时间表最后一列 = 计算 + 未掩盖通信 + Free − bubble；理论 bubble = (PP − 1) / (MBN + PP − 1)。理论比例直接转换为百分比。</p><div data-r="notes"></div><div class="warn" data-r="warnings"></div><div class="path" data-r="path"></div><p data-r="generated"></p></details><noscript>请允许浏览器运行 JavaScript，或查看随报告导出的 CSV。</noscript>
+<div class="filter-hint-anchor"><div class="filter-hint" hidden><span class="filter-hint-label">本行筛选</span><span class="filter-hint-hand" aria-hidden="true">&#9758;</span></div></div>
+<div class="card"><div class="toolbar"><label>Step <select data-r="step" aria-label="Step"></select></label><div class="picker-field"><span>Stage</span><details class="stage-picker"><summary aria-label="Stage选择"><span data-r="stage-count"></span> ▾</summary><div class="stage-options"><div class="stage-actions"><button type="button" data-r="stage-all">全选</button><button type="button" data-r="stage-none">清空</button></div><div data-r="stage-options"></div></div></details></div><div class="picker-field"><span>卡号</span><details class="stage-picker"><summary aria-label="卡号选择"><span data-r="rank-count"></span> ▾</summary><div class="stage-options"><div class="stage-actions"><button type="button" data-r="rank-all">全选</button><button type="button" data-r="rank-none">清空</button></div><div data-r="rank-options"></div></div></details></div><label>单位 <select data-r="unit" aria-label="单位"><option value="s" selected>秒（s）</option><option value="ms">毫秒（ms）</option><option value="us">微秒（μs）</option></select></label><label class="mode"><input type="checkbox" role="switch" aria-label="百分比显示" data-r="percentage">百分比</label><button class="download" data-r="download">导出当前表格 CSV</button></div><div class="scroll"><table><caption>全局总览</caption><thead><tr data-r="headers"></tr></thead><tbody data-r="rows"></tbody></table></div><div class="footer"><span data-r="row-count"></span><span data-r="unit-note"></span></div></div>
+<p class="note"><b>端到端时间 = 计算 + 未掩盖通信 + Free。</b> 时间占比以当前行端到端时间为分母；层数、重计算与显存保持原值。<br><b>总通信 = 未掩盖通信 + 掩盖通信。</b> 掩盖通信与计算存在重叠，各时间项不能直接全部相加；“—”表示暂无数据。</p><noscript>请允许浏览器运行 JavaScript，或查看随报告导出的 CSV。</noscript>
 <script type="application/json" id="rank-step-time-data">__DATA__</script><script>
 (()=>{
 'use strict';
@@ -24,11 +65,7 @@ const number=value=>value===null||value===undefined||value===''?null:(Number.isF
 const fixed=value=>value===null?'—':value.toFixed(2);
 const chipDefinitions=[['actual_ranks','实际采集卡数'],['profiling_ranks','总卡数'],['GBS','GBS'],['MBS','MBS'],['MBN','MBN'],['PP','PP'],['DP','DP'],['EP','EP'],['CP','CP'],['TP','TP'],['step_time','单Step耗时(s)']];
 for(const [key,label] of chipDefinitions){const chip=document.createElement('div'),caption=document.createElement('span'),value=document.createElement('strong');chip.className='chip';chip.dataset.config=key;caption.textContent=label;value.dataset.summary=key;value.textContent=key==='actual_ranks'?String(summary[key]??data.ranks?.length??'—'):String(summary[key]??'—');if(key==='profiling_ranks')chip.title='Profiling 元数据中的 world_size';if(key==='step_time')chip.title='当前 Step 实际采集卡端到端时间的最大值，单位为秒';chip.append(caption,value);q('summary').append(chip);}
-q('path').textContent=JSON.stringify({profiling_path:data.profiling_path,sources:overview.sources||data.sources||[]},null,2);
-q('generated').textContent=data.generated_at?'生成时间：'+data.generated_at:'';
-for(const note of overview.notes||[]){const p=document.createElement('p');p.textContent=typeof note==='string'?note:JSON.stringify(note);q('notes').append(p);}
-for(const warning of data.warnings||[]){const p=document.createElement('p');p.textContent=warning;q('warnings').append(p);}
-for(const step of steps){const option=document.createElement('option');option.value=step;option.textContent='Step '+step;q('step').append(option);}
+for(const step of steps){const option=document.createElement('option');option.value=step;option.textContent=step==='unassigned'?'未分步':step;q('step').append(option);}
 function label(col){return col.label;}
 function metricValue(row,col){
  const value=number(row[col.key]);if(value===null)return null;
@@ -43,14 +80,57 @@ function formatCell(row,col,forCSV=false){
  if(col.kind==='ratio'||q('percentage').checked&&col.kind==='time')return fixed(value)+'%';
  return forCSV?fixed(value):value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-function matches(row,term){
- const explicit=term.match(/^(stage|rank|卡号)[:：](.*)$/i);
- const values=explicit?[String(row[explicit[1].toLowerCase()==='stage'?'stage':'卡号']??'')]:[String(row.stage??''),String(row['卡号']??'')];
- return values.some(value=>value=== (explicit?explicit[2]:term));
+const stageOf=row=>String(row.stage??'未知');
+const rankOf=row=>String(row['卡号']);
+const selectedStages=new Set(),selectedRanks=new Set();
+function rebuildPicker(kind,values,selected,text,onChange){
+ const panel=q(kind+'-options');
+ panel.replaceChildren();
+ selected.clear();
+ for(const value of values){
+  const label=document.createElement('label'),check=document.createElement('input');
+  check.type='checkbox';check.value=value;check.checked=true;selected.add(value);
+  label.append(check,document.createTextNode(text(value)));
+  check.addEventListener('change',()=>{
+   if(check.checked)selected.add(value);else selected.delete(value);
+   apply();
+  });
+  panel.append(label);
+ }
+ function apply(){
+  q(kind+'-count').textContent=selected.size+'/'+values.length;
+  onChange();
+ }
+ for(const [action,active] of [['all',true],['none',false]])q(kind+'-'+action).onclick=()=>{
+  selected.clear();
+  for(const check of panel.querySelectorAll('input')){
+   check.checked=active;
+   if(active)selected.add(check.value);
+  }
+  apply();
+ };
+ apply();
 }
+function updateScope(){
+ const rows=data.steps[q('step').value]||[];
+ const stages=[...new Set(rows.map(stageOf))].sort((a,b)=>a.localeCompare(b,'zh-CN',{numeric:true}));
+ rebuildPicker('stage',stages,selectedStages,value=>'Stage '+value,()=>{
+  const ranks=[...new Set(rows.filter(row=>selectedStages.has(stageOf(row))).map(rankOf))].sort((a,b)=>Number(a)-Number(b));
+  rebuildPicker('rank',ranks,selectedRanks,value=>'Rank '+value,render);
+ });
+}
+const toolbar=root.querySelector('.toolbar');
+toolbar.addEventListener('focusout',event=>{
+ const picker=event.target.closest('.stage-picker');
+ if(picker&&!picker.contains(event.relatedTarget))picker.open=false;
+});
+toolbar.addEventListener('keydown',event=>{
+ const picker=event.target.closest('.stage-picker');
+ if(event.key==='Escape'&&picker?.open){picker.open=false;picker.querySelector('summary').focus();}
+});
 function headers(){
  q('headers').replaceChildren();
- for(const col of cols){const th=document.createElement('th'),button=document.createElement('button'),caption=document.createElement('span'),icon=document.createElement('span');th.scope='col';button.setAttribute('aria-label',label(col));caption.className='header-label';caption.textContent=label(col);icon.className='sort-icon';icon.setAttribute('aria-hidden','true');button.append(caption,icon);button.title=col.description||col.tooltip||label(col);button.addEventListener('click',()=>{direction=sortKey===col.key?-direction:1;sortKey=col.key;render();});th.append(button);q('headers').append(th);}
+ for(const col of cols){const th=document.createElement('th'),button=document.createElement('button'),caption=document.createElement('span'),icon=document.createElement('span');th.scope='col';button.type='button';button.setAttribute('aria-label',label(col));caption.className='header-label';caption.textContent=label(col);icon.className='sort-icon';icon.setAttribute('aria-hidden','true');button.append(caption,icon);button.title=col.description||col.tooltip||label(col);th.addEventListener('click',()=>{direction=sortKey===col.key?-direction:1;sortKey=col.key;render();});th.append(button);q('headers').append(th);}
 }
 const table=root.querySelector('table');let hoverCell=null;
 function clearTableHover(){table.querySelectorAll('.row-hover,.column-hover').forEach(e=>e.classList.remove('row-hover','column-hover'));hoverCell=null;}
@@ -62,23 +142,39 @@ function render(){
  cols=definitions.filter(col=>!col.mode||col.mode===(percent?'percent':'time'));
  if(!cols.some(col=>col.key===sortKey)){sortKey=cols[0]?.key;direction=1;}
  headers();q('unit').disabled=percent;
- const terms=q('search').value.trim().split(/[,，\s]+/).filter(Boolean);
- visible=rows.filter(row=>!terms.length||terms.some(term=>matches(row,term)));
+ visible=rows.filter(row=>selectedStages.has(stageOf(row))&&selectedRanks.has(rankOf(row)));
  const sortCol=cols.find(col=>col.key===sortKey);
  visible.sort((a,b)=>{const left=metricValue(a,sortCol),right=metricValue(b,sortCol);if(left===null)return right===null?number(a['卡号'])-number(b['卡号']):1;if(right===null)return -1;return (left-right)*direction||(number(a['卡号'])-number(b['卡号']));});
  q('rows').replaceChildren();
  const maxima=Object.fromEntries(cols.map(col=>[col.key,Math.max(0,...rows.map(row=>metricValue(row,col)??0))]));
- for(const row of visible){const tr=document.createElement('tr');tr.dataset.rank=row['卡号'];for(const col of cols){const td=document.createElement('td'),value=metricValue(row,col);td.textContent=formatCell(row,col);td.dataset.key=col.key;if(col.key==='stage'||col.key==='卡号'){td.title='Stage：'+(row.stage??'—')+'；原始卡号（rank）：'+row['卡号']+(row.pp_group!==undefined?'；PP 分组：'+(typeof row.pp_group==='object'?JSON.stringify(row.pp_group):row.pp_group):'');}else if(col.kind==='time'||col.kind==='ratio'){td.className='metric';const width=percent?value:maxima[col.key]?value/maxima[col.key]*100:0;td.style.setProperty('--pct',Math.max(0,Math.min(100,width??0))+'%');td.title=value===null?'暂无数据':col.kind==='ratio'?'理论 bubble = (PP − 1) / (MBN + PP − 1)':'原始值：'+fixed(number(row[col.key]))+' μs'+(percent?'；分母：'+fixed(number(row['端到端时间']))+' μs':'');}else if(col.kind==='memory'){td.title='显存峰值（GiB）；采集范围与来源见“数据来源与统计口径”';}tr.append(td);}q('rows').append(tr);}
+ for(const row of visible){const tr=document.createElement('tr');tr.dataset.rank=row['卡号'];for(const col of cols){const td=document.createElement('td'),value=metricValue(row,col);td.textContent=formatCell(row,col);td.dataset.key=col.key;if(col.key==='stage'||col.key==='卡号'){td.title='Stage：'+(row.stage??'—')+'；原始卡号（rank）：'+row['卡号']+(row.pp_group!==undefined?'；PP 分组：'+(typeof row.pp_group==='object'?JSON.stringify(row.pp_group):row.pp_group):'');}else if(col.kind==='time'||col.kind==='ratio'){td.className='metric';const width=percent?value:maxima[col.key]?value/maxima[col.key]*100:0;td.style.setProperty('--pct',Math.max(0,Math.min(100,width??0))+'%');td.title=value===null?'暂无数据':col.kind==='ratio'?'理论 bubble = (PP − 1) / (MBN + PP − 1)':'原始值：'+fixed(number(row[col.key]))+' μs'+(percent?'；分母：'+fixed(number(row['端到端时间']))+' μs':'');}else if(col.kind==='memory'){td.title='显存峰值（GiB）';}tr.append(td);}q('rows').append(tr);}
  if(!visible.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=cols.length;td.className='empty';td.textContent='没有匹配的 Stage / 卡号';tr.append(td);q('rows').append(tr);}
- [...q('headers').children].forEach((th,i)=>{const active=cols[i].key===sortKey;th.setAttribute('aria-sort',active?(direction===1?'ascending':'descending'):'none');th.querySelector('.sort-icon').textContent=active?(direction===1?'↑':'↓'):'↕';});
+ [...q('headers').children].forEach((th,i)=>{const active=cols[i].key===sortKey;th.setAttribute('aria-sort',active?(direction===1?'ascending':'descending'):'none');});
  const stepTime=number(overview.step_time_us?.[step]);root.querySelector('[data-summary="step_time"]').textContent=fixed(stepTime===null?null:stepTime/1000000);
  q('row-count').textContent='显示 '+visible.length+' / '+rows.length+' 张采集卡';
  q('unit-note').textContent=percent?'时间占比：各项 ÷ 当前行端到端时间 × 100%；理论 bubble 按公式计算':'时间单位：'+({us:'微秒（μs）',ms:'毫秒（ms）',s:'秒（s）'}[q('unit').value])+'；显存单位：GiB';
 }
-for(const control of ['step','unit','percentage'])q(control).addEventListener('change',render);
-q('search').addEventListener('input',render);
+for(const control of ['unit','percentage'])q(control).addEventListener('change',render);
+q('step').addEventListener('change',updateScope);
 const csvCell=value=>/[",\r\n]/.test(String(value))?'"'+String(value).replace(/"/g,'""')+'"':String(value);
 q('download').addEventListener('click',()=>{const content='\uFEFF'+[cols.map(label),...visible.map(row=>cols.map(col=>formatCell(row,col,true)))].map(row=>row.map(csvCell).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([content],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='overview_step_'+q('step').value.replace(/[^a-zA-Z0-9_-]/g,'_')+'_'+(q('percentage').checked?'percent':q('unit').value)+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
-render();
+updateScope();
+function watchFilterHints(){
+ const page=document.documentElement;
+ if(page.hasAttribute('data-filter-hints-watching'))return;
+ page.setAttribute('data-filter-hints-watching','');
+ const hints=document.querySelectorAll('#rank-step-time .filter-hint, #pp-schedule .filter-hint');
+ const observer=new IntersectionObserver(entries=>{
+  if(!entries.some(entry=>entry.intersectionRatio>=.5))return;
+  observer.disconnect();
+  for(const hint of hints)hint.hidden=false;
+  setTimeout(()=>{for(const hint of hints)hint.hidden=true;},20000);
+ },{threshold:.5});
+ for(const section of document.querySelectorAll('#rank-step-time .toolbar, #pp-schedule .filter-toolbar')){
+  observer.observe(section.firstElementChild);
+ }
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watchFilterHints,{once:true});
+else watchFilterHints();
 })();
 </script></section>

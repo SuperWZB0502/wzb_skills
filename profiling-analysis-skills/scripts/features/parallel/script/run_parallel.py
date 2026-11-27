@@ -8,7 +8,8 @@ from workflow_support import (InputProblem,Progress,normalize_input,input_states
     outputs_state,outputs_match,lock_file,write_delivery,capture_logs,finish_action,ensure_output_paths)
 FEATURE=Path(__file__).resolve().parents[1]
 CORE=['parallel_domain_split.py','parallel_domains.py','domain_trace.py','global_communication.py','pp_enrichment.py','pp_flow.py',
-      'timeline_streams.py','timeline_streams_tlv.py','timeline_training.py','phase_markers.py','unified_timeline.py','timeline_colors.py','parallel_workers.py','fast_json.py','parallel_domain_registry.py','mindspeed_domains.py','refresh_domains.py','run_parallel.py']
+      'timeline_streams.py','timeline_streams_tlv.py','timeline_training.py','phase_markers.py','unified_timeline.py','timeline_colors.py','parallel_workers.py','fast_json.py','parallel_domain_registry.py','mindspeed_domains.py','hyperparallel_domains.py','refresh_domains.py','run_parallel.py',
+      '../../../training_log.py']
 
 def capabilities(out,probe,communication_only,validation):
     pp=load_json(out/'report.json');summary=load_json(out/'unified_summary.json');stats=summary['stats'];unknown=load_json(out/'domains/unresolved/report.json') if (out/'domains/unresolved/report.json').exists() else {'events':[]}

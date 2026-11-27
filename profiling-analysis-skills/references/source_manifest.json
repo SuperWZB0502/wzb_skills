@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-11-14T07:35:48.450716+00:00",
+  "updated_at": "2026-11-27T16:19:01.095Z",
   "description": "正式运行脚本、模板、JS及统一生成入口；不包含profiling或历史缓存。source为来源说明，不是运行时依赖。",
   "files": [
     {
       "packaged": "scripts/assemble_report.py",
       "source": "skill-local",
-      "sha256": "397262123b2a0ca65de689e70d9eba2f907290251bf0c94b0c19ed238308b989"
+      "sha256": "3eb9c5f6330bccdc10b95569f30c1246ab6b2fcb84deff361debbdf93aeac4c3"
     },
     {
       "packaged": "scripts/benchmark_html.py",
@@ -17,6 +17,31 @@
       "packaged": "scripts/capture_previews.py",
       "source": "skill-local",
       "sha256": "e23c250e95b0842781ba122998d58f9df8f85a9d3773ce54239458474dfebef4"
+    },
+    {
+      "packaged": "scripts/features/operator/script/browser_check.py",
+      "source": "skill-local",
+      "sha256": "fd91146b2ca80099a52c5059acc0c6c29eb71b09f3732c4046d95c81222fb1f8"
+    },
+    {
+      "packaged": "scripts/features/operator/script/operator_data.py",
+      "source": "skill-local",
+      "sha256": "e386aba816eb7896901f2bc353eade323a84baf8317a8e4515da6d9a3f7d994c"
+    },
+    {
+      "packaged": "scripts/features/operator/script/operator_details.html",
+      "source": "skill-local",
+      "sha256": "c5ef854d6cf4474c468037a260c10620dc2d79495b210e07bc81f3158853e07f"
+    },
+    {
+      "packaged": "scripts/features/operator/script/operator_details.js",
+      "source": "skill-local",
+      "sha256": "499faec628aa6043ce01098a0d70597ebeab5791a0816b9a63cec96635991bb8"
+    },
+    {
+      "packaged": "scripts/features/operator/script/run_operator.py",
+      "source": "skill-local",
+      "sha256": "a6f20ae2a4cf77a656ecb635c2d84e179757d69f57f758aea4e388ca376305b0"
     },
     {
       "packaged": "scripts/features/overview/script/browser_check.py",
@@ -31,7 +56,7 @@
     {
       "packaged": "scripts/features/overview/script/global_overview.html",
       "source": "msinsight调研/功能01_每卡Step耗时统计/script/global_overview.html",
-      "sha256": "f5e62afebeed9895c9ba6bd2bda8f6aa0b2e6e3f1b7376c08f457fadf109d7f7"
+      "sha256": "d48176fb7edfbf664e752483ed93fba9c46eed76be0b0e66bbb32e7babdd46a5"
     },
     {
       "packaged": "scripts/features/overview/script/global_overview.py",
@@ -46,7 +71,7 @@
     {
       "packaged": "scripts/features/overview/script/overview_config.py",
       "source": "msinsight调研/功能01_每卡Step耗时统计/script/overview_config.py",
-      "sha256": "e1256abf422ee7600a27a4a616e1da9c02f375faaf1aa92246bf555b0b4a1436"
+      "sha256": "4b69cfdb7120ced1e871d89ade5be9e869fc7be286d8603c68f1e23ffeea48e5"
     },
     {
       "packaged": "scripts/features/overview/script/query_evidence.py",
@@ -56,12 +81,12 @@
     {
       "packaged": "scripts/features/overview/script/render_overview.py",
       "source": "msinsight调研/功能01_每卡Step耗时统计/script/render_overview.py",
-      "sha256": "de8298d7025397fc8abb771382fa0793ea70cbefe7a711b308db4a04e5ca0651"
+      "sha256": "4bc0213d7b37836d99727e53bc7aefcd697543fd27c762b25b7dd762af9afd06"
     },
     {
       "packaged": "scripts/features/overview/script/run_overview.py",
       "source": "msinsight调研/功能01_每卡Step耗时统计/script/run_overview.py",
-      "sha256": "f0759a5570d2342a539dfd062ab896f12f4bc9a9d616b4e6759bb21fdd5b3b3d"
+      "sha256": "dd38afe64bd775be1f759414657a44c95b62298e7a116d48e679d0aaf9ea1a27"
     },
     {
       "packaged": "scripts/features/overview/script/script_catalog.py",
@@ -71,17 +96,17 @@
     {
       "packaged": "scripts/features/overview/script/validate_overview.py",
       "source": "msinsight调研/功能01_每卡Step耗时统计/script/validate_overview.py",
-      "sha256": "da5d099ddcf21cee0d8c8f3084786a08db200e9851365f807a66bbcbdc5eb2aa"
+      "sha256": "ee66dc3c1e9a86ea8566934074af6098abf77236b97afa8cd5b803533775dbcc"
     },
     {
       "packaged": "scripts/features/overview/script/workflow_support.py",
       "source": "msinsight调研/功能01_每卡Step耗时统计/script/workflow_support.py",
-      "sha256": "7a2993baeda4bd5392265f0fd352805ccacb9daea538e416878e7b3c394d4ea8"
+      "sha256": "164aa5e33ad76dd8501e9a457bf4e1a3f49eacf384bbcba522edefa9b41a7238"
     },
     {
       "packaged": "scripts/features/parallel/script/browser_check.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/browser_check.py",
-      "sha256": "96cc651d35df16fa833a923b6b770b2447befd42d8e4db8aa102300be14eaae4"
+      "sha256": "fc858faf95ccdf348de94576b6fa731dc2dc61a3e85b8eab8c5b44de3249655f"
     },
     {
       "packaged": "scripts/features/parallel/script/compact_timeline.js",
@@ -96,12 +121,12 @@
     {
       "packaged": "scripts/features/parallel/script/detail_panels.js",
       "source": "msinsight调研/功能02_5D并行通信图/script/detail_panels.js",
-      "sha256": "11d6764b30d86a92514647b656005bd5021c78b82fab3fae35457faf639dcdd7"
+      "sha256": "dc0fb00ef7a61cc52eb885d81abbb77e1ae88f29eb20987265cde960e5aab358"
     },
     {
       "packaged": "scripts/features/parallel/script/domain_trace.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/domain_trace.py",
-      "sha256": "579f7c673d218008da4df94e0789e2d803309649d0a5026562147c1e15fed030"
+      "sha256": "f064f8e9026cdb24ca0cbf646ec92e41ab22b32eebdf89a614f8094efc3a6a9b"
     },
     {
       "packaged": "scripts/features/parallel/script/fast_json.py",
@@ -117,6 +142,11 @@
       "packaged": "scripts/features/parallel/script/global_communication.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/global_communication.py",
       "sha256": "29d3ad4f5339ba8a87a187fbba797f9b32da79ba9e77fcf1a14f114562a38978"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/hyperparallel_domains.py",
+      "source": "skill-local",
+      "sha256": "d051f2dbf5e63cdfae4df1a1cfa8366608a99bcb083cdfbd30ab24a3370e77d8"
     },
     {
       "packaged": "scripts/features/parallel/script/mindspeed_domains.py",
@@ -146,17 +176,17 @@
     {
       "packaged": "scripts/features/parallel/script/parallel_domain_split.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/parallel_domain_split.py",
-      "sha256": "2673300f014a009217c38d2a9f943d25148e45da40b8f63211e91787fce7e0c9"
+      "sha256": "5f49afe4f38b66515c22b0d864a83a6dacd010c4b820fcdd7ee251e5fc14caf9"
     },
     {
       "packaged": "scripts/features/parallel/script/parallel_domains.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/parallel_domains.py",
-      "sha256": "173e8d41e982b534ef0c83d4953fa2b42a0f7e13ae3d66c0a252ee09a4b2bb89"
+      "sha256": "e6b8549fb75084f1c6cc67d98c8ebf4bd979f06e1b1cd119fdfb69be0c955feb"
     },
     {
       "packaged": "scripts/features/parallel/script/parallel_timeline.html",
       "source": "msinsight调研/功能02_5D并行通信图/script/parallel_timeline.html",
-      "sha256": "87298df43878fd199e74b4fdedf1bef854f5d3cafd7e8ce64952a11e8d7d264e"
+      "sha256": "434383614b0f640c2366847d0c0d8572e1b158d2fd96fe9416a249e78ad97df1"
     },
     {
       "packaged": "scripts/features/parallel/script/parallel_workers.py",
@@ -171,7 +201,7 @@
     {
       "packaged": "scripts/features/parallel/script/pp_enrichment.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/pp_enrichment.py",
-      "sha256": "171514441556253553b3e80856ccdf90defa4d843bba319be1c74a1b7c2f60d3"
+      "sha256": "a5c70f72b8af8eabbe40f9311d590443eeeceae4448681dec03e40a89cb7ab64"
     },
     {
       "packaged": "scripts/features/parallel/script/pp_flow.py",
@@ -181,7 +211,7 @@
     {
       "packaged": "scripts/features/parallel/script/presentation_summary.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/presentation_summary.py",
-      "sha256": "2bc157d133d7fa0671b450ef3a1043fbc557801458e8c08af0a2309bf92a21d2"
+      "sha256": "c1e922a9340682f9e2e70285945d229d4ad7a14bcb53ce4ac47080e03e64965d"
     },
     {
       "packaged": "scripts/features/parallel/script/query_evidence.py",
@@ -191,7 +221,7 @@
     {
       "packaged": "scripts/features/parallel/script/refresh_domains.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/refresh_domains.py",
-      "sha256": "0324b4324dc30fd7666ce4ec347de15e6336f209e529c5b5d430564060414837"
+      "sha256": "45f73fefc3bfe95a3622efc377ba0ef4d63d7cf2b34ccd8ee30c7896e8aebc50"
     },
     {
       "packaged": "scripts/features/parallel/script/render_parallel.py",
@@ -201,7 +231,7 @@
     {
       "packaged": "scripts/features/parallel/script/run_parallel.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/run_parallel.py",
-      "sha256": "6ac28136607841c5fbc51c1dc7afd38cebdf1dcf053527f0af164f97461a905e"
+      "sha256": "473221d8107b97a5621af69a4b09878a62800bf035409f8114510f08ba9db17e"
     },
     {
       "packaged": "scripts/features/parallel/script/script_catalog.py",
@@ -231,12 +261,12 @@
     {
       "packaged": "scripts/features/parallel/script/timeline_training.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/timeline_training.py",
-      "sha256": "e74a926d657100bbeff48fa4df99f7be5283e3bd51d0a963d57e052088fd2a85"
+      "sha256": "a02febe948585220fc6c243c242309d23d6119ffbc5c5f6cebee69e3028c1bd9"
     },
     {
       "packaged": "scripts/features/parallel/script/unified_timeline.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/unified_timeline.py",
-      "sha256": "70ebbf7be99a63003d3e6c816d1d9a95027e46de90cd74a97222cf9f3a4c11ed"
+      "sha256": "99ff433d027621f0456e999d056821ee04ed6caeaee026ef74b7aa3f692df702"
     },
     {
       "packaged": "scripts/features/parallel/script/validate_html_payload.py",
@@ -266,7 +296,12 @@
     {
       "packaged": "scripts/features/parallel/script/workflow_support.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/workflow_support.py",
-      "sha256": "4a31de192daf746a1fb2c552ae410ee7a23297635898a20a02568f17315759dd"
+      "sha256": "f890c6cc3f565b1b6642a934df827d7fd9eda27fe915af357a92c166a2a128d1"
+    },
+    {
+      "packaged": "scripts/flat_export.py",
+      "source": "skill-local",
+      "sha256": "5e77b7887bba92cdef67af4de507a21f3c9cdaf6a6e9be21ae107347d2d4e397"
     },
     {
       "packaged": "scripts/ingest_trace.py",
@@ -279,6 +314,11 @@
       "sha256": "07205636b08520b172976c8896051097c481a4a775092ad70d7cdb3fc63e3c5c"
     },
     {
+      "packaged": "scripts/report_lock.py",
+      "source": "skill-local",
+      "sha256": "0aa6bbec07c1cb880136346755b58c31aea0ca475eed03b28dbe51f77b638c24"
+    },
+    {
       "packaged": "scripts/requirements.txt",
       "source": "skill-local",
       "sha256": "1d97a85938c248f4ce6a06105afd48c86ac394043c6a0da8860e1001ca0a1d39"
@@ -286,12 +326,17 @@
     {
       "packaged": "scripts/run_analysis.py",
       "source": "skill-local",
-      "sha256": "b853fe7a9bc16676e333ecd83a6f745f0ac3102fa8485a008693adec5ddcc2f7"
+      "sha256": "60478eb76841b2187cb7cb76e9a3312c2fd66e1c9328f6983b49d6ad0c682034"
+    },
+    {
+      "packaged": "scripts/training_log.py",
+      "source": "skill-local",
+      "sha256": "1b241dbcdf47616c9da8c55ca9aa91f0b71a85e987706aadc55f3dbd84c2ed52"
     },
     {
       "packaged": "scripts/verify_package.py",
       "source": "skill-local",
-      "sha256": "a613e94026aa5af6420a29b8d18f4823b246d87a10ca7cee95afe987fd926b40"
+      "sha256": "2ab8e95ad5e5d5a8a199d4203d44b57fe53f83027954808930fc3db4b43dcd8e"
     },
     {
       "packaged": "scripts/worker_budget.py",

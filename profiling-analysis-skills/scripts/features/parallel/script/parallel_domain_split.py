@@ -25,7 +25,7 @@ from parallel_domain_registry import DOMAINS as DOMAIN_ORDER
 
 FEATURE_DIR=Path(__file__).absolute().parents[1]
 ROOT=FEATURE_DIR.parent
-VERSION=4
+VERSION=5
 START='<!-- MSINSIGHT:pp-schedule:START -->'
 END='<!-- MSINSIGHT:pp-schedule:END -->'
 PLACEHOLDER='<!-- MSINSIGHT_FEATURES_END -->'
@@ -253,7 +253,6 @@ def build_report(ranks,catalog,selectors=None,all_groups=False,step_filter=None)
         end=max((Decimal(row.get('trace_bounds',{}).get('end_us','1'))-origin for row in ranks),default=Decimal(1))
         bounds['unassigned']={'start_us':'0','end_us':str(max(end,Decimal(1)))}
         warnings.append('缺少ProfilerStep标记，按完整采集范围显示未分步事件。')
-    if not selected:warnings.append('没有可确认的PP通信组；其他通信域和设备流独立处理，PP/micro能力保持未知或不适用。')
     if step_filter is not None and step_filter not in bounds:raise ValueError(f'没有Step {step_filter}的时间范围')
     used={step_filter} if step_filter is not None else set(bounds)
     return {'schema_version':2,'feature_id':'pp-schedule','time_unit':'us','time_origin_us':str(origin),
@@ -371,6 +370,8 @@ def main(argv=None):
         domain_reports={};unified_report=None
         if not args.pp_only:
             from parallel_domains import build_domain_reports
+            missing_raw_index=not args.communication_only and any(
+                not (args.output_dir/f'timeline_cache/raw_rank_{rank}.json.gz').is_file() for rank in sources)
             roles=json.loads(args.domain_roles.read_text(encoding='utf-8')) if args.domain_roles else None
             if roles is not None and not isinstance(roles,dict):raise ValueError('--domain-roles需要JSON对象，键为完整通信组标识')
             domain_reports=build_domain_reports(profiling,ranks,report,args.output_dir,
@@ -379,13 +380,6 @@ def main(argv=None):
             dump_json(pp_output/'report.json',report)
             dump_json(pp_output/'group_catalog.json',report['groups'])
             write_csv(pp_output/'communication_events.csv',report)
-            domain_order=(*DOMAIN_ORDER,'unresolved') if domain_reports.get('unresolved',{}).get('events') else DOMAIN_ORDER
-            dump_json(args.output_dir/'domains/index.json',{
-                'order':list(domain_order), 'time_unit':'us',
-                'time_origin_us':report['time_origin_us'],
-                'modules':[{ 'domain':d, 'report':d+'/report.json',
-                    'events':len(payload['events']), 'groups':len(payload['groups'])}
-                    for d,payload in [('PP',report)]+[(d,domain_reports[d]) for d in domain_order[1:]]]})
             from timeline_streams import collect_timeline_streams
             from unified_timeline import build_unified_report
             report['rank_stages']={str(k):v for payload in domain_reports.values() for k,v in payload.get('rank_stages',{}).items()}
@@ -397,8 +391,21 @@ def main(argv=None):
                     from parallel_workers import prepare_stream_inputs
                     prepare_stream_inputs(ranks,report,args.output_dir,args.workers)
                 streams=collect_timeline_streams(profiling,ranks,report,args.output_dir)
+                if missing_raw_index:
+                    from hyperparallel_domains import mesh_evidence
+                    if mesh_evidence(profiling,args.log_dir):
+                        domain_reports=build_domain_reports(profiling,ranks,report,args.output_dir,
+                            cache_dir=args.output_dir/'domain_cache',overrides=roles,log_dir=args.log_dir)
+                        report['rank_stages']={str(k):v for payload in domain_reports.values() for k,v in payload.get('rank_stages',{}).items()}
                 from phase_markers import collect_phase_markers
                 markers=collect_phase_markers(report,streams,args.output_dir)
+            domain_order=(*DOMAIN_ORDER,'unresolved') if domain_reports.get('unresolved',{}).get('events') else DOMAIN_ORDER
+            dump_json(args.output_dir/'domains/index.json',{
+                'order':list(domain_order), 'time_unit':'us',
+                'time_origin_us':report['time_origin_us'],
+                'modules':[{'domain':d,'report':d+'/report.json',
+                    'events':len(payload['events']),'groups':len(payload['groups'])}
+                    for d,payload in [('PP',report)]+[(d,domain_reports[d]) for d in domain_order[1:]]]})
             unified_report=build_unified_report(report,domain_reports,streams,markers)
             unified_report['analysis_options']={'communication_only':args.communication_only}
             dump_json(args.output_dir/'unified_report.json',unified_report)
