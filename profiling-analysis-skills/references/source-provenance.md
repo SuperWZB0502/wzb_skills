@@ -14,7 +14,9 @@
 
 原msinsight代码采用Mulan PSL v2；上游仓库为https://gitcode.com/Ascend/msinsight 。本技能没有打包整个上游仓库、开发样例profiling、原始trace或历史分析缓存。需要核对原工具时按上述文件/函数定位；相应源码快照和更长的研发审计保留在原调研工作区。
 
-维护时修改技能内scripts/features各功能的Python/HTML源文件，再用统一入口生成和核对产物。纯样式/交互修改走render-only；数据规则变化按来源和代码指纹重建。保持两功能的独立进程加载方式，避免workflow_support等同名模块串用。
+维护时修改技能内 `scripts/features` 各功能的 Python 和 HTML，再用统一入口生成和核对产物。纯样式或交互修改走 `--render-only`。各功能在独立进程加载。
+
+功能3由本项目按 MindStudio Insight 算子页的可见行为和 `server/src/modules/operator` 的字段和分组语义实现。Python 直接读取 TEXT 或兼容的 Ascend DB，HTML 负责本地显示与 CSV 下载。
 
 最新包包含扩展域注册表、MindSpeed通信组构建规则、轻量语义刷新、算子性能公式和统一详情JS。MindSpeed构建规则来源于megatron/core/parallel_state.py的RankGenerator及initialize_model_parallel，已转成不依赖模型仓库/torch的纯Python规则。source_manifest.json的source路径只说明开发来源，不是运行时加载路径。
 

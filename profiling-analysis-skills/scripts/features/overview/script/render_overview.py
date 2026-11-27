@@ -15,7 +15,7 @@ def render(output_dir,html):
         write_json(Path(output_dir)/'report.json',data)
         for step in data['steps']:
             for mode in ('time','percent'):
-                (Path(output_dir)/f'overview_step_{step}_{mode}.csv').write_text(overview_csv(data,step,mode),encoding='utf-8-sig')
+                (Path(output_dir)/f'overview_step_{step}_{mode}.csv').write_text(overview_csv(data,step,mode),encoding='utf-8-sig',newline='')
     encoded=json.dumps(data,ensure_ascii=False,allow_nan=False).replace('<','\\u003c').replace('>','\\u003e').replace('&','\\u0026')
     update_section(html,START,END,SECTION_PATH.read_text(encoding='utf-8').replace('__DATA__',encoded))
     return str(Path(html).resolve())

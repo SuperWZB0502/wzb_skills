@@ -1,0 +1,118 @@
+<!-- MSINSIGHT:operator-details:START -->
+<section class="operator-report" aria-label="算子详情">
+  <style>
+    .operator-report{--ink:#172538;--muted:#617084;--line:#e3e9ef;--accent:#087f75;--cell-hover:#f0f8f6;box-sizing:border-box;width:100%;max-width:1600px;min-width:0;margin:56px auto 32px;padding:32px 24px 0;border-top:1px solid #dae3eb;color:var(--ink);font:14px/1.6 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+    .operator-report:first-child{margin-top:32px;padding-top:0;border-top:0}
+    .operator-report *{box-sizing:border-box}
+    .operator-report h2{font-size:30px;line-height:1.3;margin:8px 0 18px}
+    .operator-report .eyebrow{font-size:12px;font-weight:700;color:var(--accent)}
+    .operator-report h3{font-size:14px;margin:0 0 10px;color:var(--ink)}
+    .operator-report .op-config,.operator-report .op-filters,.operator-report .op-page{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#fff;padding:12px 16px}
+    .operator-report .op-config{border:1px solid var(--line);border-radius:14px;padding:16px}
+    .operator-report label{display:inline-flex;align-items:center;gap:6px;min-width:0;font-size:12px;color:var(--muted)}
+    .operator-report select,.operator-report input,.operator-report button{font:inherit;color:var(--ink);background:#fff;border:1px solid #cfd9e2;border-radius:7px;padding:7px 10px;max-width:100%}
+    .operator-report input[type=search]{width:140px}
+    .operator-report .op-combo{display:flex;align-items:center;position:relative;gap:0;min-width:0}
+    .operator-report .op-combo input{border-radius:7px 0 0 7px}
+    .operator-report .op-combo-arrow{align-self:stretch;display:grid;place-items:center;width:29px;padding:0;border-radius:0 7px 7px 0;border-left:0}
+    .operator-report .op-combo-menu{position:absolute;top:calc(100% + 3px);left:0;z-index:5;width:230px;max-width:75vw;max-height:244px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:0 6px 20px #17253820}
+    .operator-report .op-combo-menu{overflow:hidden}
+    .operator-report .op-combo-actions{display:flex;gap:5px;padding:8px;border-bottom:1px solid var(--line)}
+    .operator-report .op-combo-actions button{padding:2px 8px;font-size:12px}
+    .operator-report .op-combo-options{max-height:200px;overflow:auto;padding:4px 8px}
+    .operator-report .op-combo-options label{display:flex;padding:4px 0;cursor:pointer}
+    .operator-report .op-combo-options label:has(input:disabled){cursor:default;opacity:.58}
+    .operator-report .op-combo-options input{flex:none;margin:0;accent-color:var(--accent)}
+    .operator-report .op-combo-options span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .operator-report .op-current{width:62px}
+    .operator-report button{cursor:pointer}
+    .operator-report button:disabled{cursor:default;opacity:.5}
+    .operator-report button:focus-visible,.operator-report select:focus-visible,.operator-report input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .operator-report .op-export{margin-left:auto;background:var(--accent);border-color:var(--accent);border-radius:8px;padding:9px 15px;color:#fff}
+    .operator-report .op-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:14px;margin:16px 0}
+    .operator-report .op-chart{min-width:0;position:relative;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+    @supports(grid-template-rows:subgrid){
+      .operator-report .op-chart{display:grid;grid-row:span 2;grid-template-rows:subgrid;row-gap:0}
+    }
+    .operator-report .op-chart-heading{display:flex;align-items:flex-start;justify-content:space-between;min-height:31px;gap:8px}
+    .operator-report .op-chart-heading button{padding:2px 8px;color:var(--accent)}
+    .operator-report .op-chart-actions{display:flex;flex:none;gap:5px}
+    .operator-report .op-core-presets{display:flex;flex-wrap:wrap;gap:5px}
+    .operator-report .op-core-types{display:flex;gap:5px}
+    .operator-report .op-core-presets button{padding:2px 8px}
+    .operator-report .op-core-summary{text-align:center;color:var(--ink);font-weight:650;font-variant-numeric:tabular-nums}
+    .operator-report .op-core-toolbar,.operator-report .op-chart-body{display:grid;grid-template-columns:206px minmax(0,1fr);gap:12px;align-items:center}
+    .operator-report .op-core-toolbar{margin-bottom:5px}
+    .operator-report .op-chart canvas{display:block;width:100%;height:210px;touch-action:none}
+    .operator-report .op-legend{max-height:210px;overflow:auto;margin:0;padding:0;list-style:none}
+    .operator-report .op-legend button{display:flex;align-items:center;gap:7px;width:100%;text-align:left;border:0;padding:4px;background:transparent}
+    .operator-report .op-legend li>label{display:flex;padding:4px;cursor:pointer}
+    .operator-report .op-legend input{margin:0;flex:none;accent-color:var(--accent)}
+    .operator-report .op-legend button[aria-pressed=false]{opacity:.45}
+    .operator-report .op-legend button.op-others:hover{text-decoration:underline}
+    .operator-report .op-legend i{width:10px;height:10px;flex:none;border-radius:2px}
+    .operator-report .op-legend span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .operator-report .op-legend .op-legend-percent{margin-left:auto;flex:none;font-variant-numeric:tabular-nums;color:var(--muted)}
+    .operator-report .op-tip{position:absolute;max-width:min(320px,calc(100% - 8px));z-index:1;pointer-events:none;background:var(--ink);color:#fff;padding:5px 8px;border-radius:7px;overflow-wrap:anywhere}
+    .operator-report .op-table-area{background:#fff;border:1px solid var(--line);border-radius:14px}
+    .operator-report .op-filters{border-bottom:1px solid var(--line);border-radius:14px 14px 0 0;background:#f8fafb}
+    .operator-report .op-scroll{overflow:auto}
+    .operator-report table{width:100%;table-layout:fixed;border-collapse:collapse;white-space:nowrap;font-variant-numeric:tabular-nums}
+    .operator-report th,.operator-report td{padding:8px;line-height:18px;text-align:left;border-bottom:1px solid #edf1f4}
+    .operator-report th{position:relative;background:#f8fafb;color:var(--ink);font-weight:650}
+    .operator-report th:not(:last-child)::after{content:"";position:absolute;right:0;top:25%;height:50%;width:1px;background:#d7dfe7;pointer-events:none}
+    .operator-report th.op-sortable{padding:0;cursor:pointer}
+    .operator-report .op-resize{position:absolute;right:0;top:0;bottom:0;width:6px;z-index:1;cursor:col-resize;touch-action:none}
+    .operator-report .op-resize:hover,.operator-report .op-resize:focus-visible{background:#087f7580}
+    .operator-report th.op-sortable:hover,.operator-report th[aria-sort]{background:var(--cell-hover)}
+    .operator-report .op-th-controls{display:flex;align-items:stretch;padding-right:7px;min-height:32px}
+    .operator-report .op-th-controls button{border:0;border-radius:0;background:transparent;color:inherit}
+    .operator-report .op-th-controls button:focus-visible{outline-offset:-2px}
+    .operator-report .op-sort{display:flex;align-items:center;justify-content:space-between;flex:1;gap:5px;min-width:0;padding:8px 4px 8px 8px;text-align:left;font-weight:inherit}
+    .operator-report .op-heading-text{overflow:hidden;text-overflow:ellipsis}
+    .operator-report .op-sort-icon{display:grid;place-content:center;gap:2px;flex:none;width:12px;color:#798592}
+    .operator-report .op-sort-icon::before,.operator-report .op-sort-icon::after{content:"";border-left:4px solid transparent;border-right:4px solid transparent}
+    .operator-report .op-sort-icon::before{border-bottom:5px solid currentColor}
+    .operator-report .op-sort-icon::after{border-top:5px solid currentColor}
+    .operator-report th[aria-sort=ascending] .op-sort-icon::before,.operator-report th[aria-sort=descending] .op-sort-icon::after{color:var(--accent)}
+    .operator-report .op-filter{display:grid;place-items:center;flex:none;width:21px;padding:0;color:#798592}
+    .operator-report .op-th-controls .op-filter:hover,.operator-report .op-th-controls .op-filter-active{color:var(--accent);background:#e9f4f1}
+    .operator-report .op-filter-icon{display:block;width:14px;height:14px;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M22 3H2l8 9.46V19l4 2v-8.54L22 3z'/%3E%3C/svg%3E") center/contain no-repeat}
+    .operator-report .op-data.op-alt{background:#f8fafb}
+    .operator-report .op-data:hover{background:var(--cell-hover)}
+    .operator-report .op-cell-text{display:block;overflow:hidden;text-overflow:ellipsis}
+    .operator-report .op-expand{display:inline-flex;align-items:center;gap:8px;border:0;color:var(--accent);padding:0;background:transparent}
+    .operator-report .op-expand:hover{text-decoration:underline}
+    .operator-report .op-chevron{width:7px;height:7px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:translateY(-2px) rotate(45deg)}
+    .operator-report .op-expand[aria-expanded=true] .op-chevron{transform:translateY(2px) rotate(225deg)}
+    .operator-report .op-sub td.op-inner{padding:8px;max-width:0;background:#f8fafb;overflow:hidden}
+    .operator-report .op-inner .op-scroll{max-width:100%}
+    .operator-report .op-sub table{background:#fff}
+    .operator-report .op-page{justify-content:flex-end;padding:10px 16px;border-radius:0 0 14px 14px;background:#fafcfd;color:var(--muted);font-size:12px}
+    .operator-report .op-page span{margin-right:auto}
+    .operator-report .op-message{margin:12px 0;color:var(--muted)}
+    .operator-report .op-help{padding:4px 12px;color:var(--muted);background:#f8fafb}
+    .operator-report .op-help summary{cursor:pointer;width:max-content}
+    .operator-report label[hidden]{display:none}
+    .operator-report :disabled{opacity:.58}
+    @media(max-width:700px){.operator-report{margin-block:24px;padding:24px 14px 0}.operator-report h2{font-size:24px}.operator-report .op-config,.operator-report .op-filters{gap:12px}}
+    @media(max-width:560px){.operator-report .op-core-toolbar,.operator-report .op-chart-body{grid-template-columns:1fr}.operator-report .op-legend{max-height:100px}.operator-report .op-export{margin-left:0}}
+  </style>
+  <div class="eyebrow">功能 03 · OPERATOR DETAILS</div>
+  <h2>算子详情</h2>
+  <div class="op-config">
+    <label>分组方式 <select data-op="mode">
+      <option value="compute">计算算子</option><option value="compute-type" selected>计算算子类型</option>
+      <option value="communication">通信算子</option><option value="communication-type">通信算子类型</option>
+    </select></label>
+    <label hidden>机器名称 <select data-op="host"></select></label>
+    <label>卡序号 <select data-op="rank"></select></label>
+    <button type="button" class="op-export" data-op="export" disabled>导出 CSV</button>
+  </div>
+  <p class="op-message" role="status">正在加载算子数据</p>
+  <div class="op-charts"></div>
+  <div class="op-table-area" hidden></div>
+  <script type="application/octet-stream" class="op-payload">__OPERATOR_PAYLOAD__</script>
+  <script>__OPERATOR_SCRIPT__</script>
+</section>
+<!-- MSINSIGHT:operator-details:END -->

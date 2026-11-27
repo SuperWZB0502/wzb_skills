@@ -40,10 +40,13 @@ def collect_summary(report, log_dir=None):
                 except (KeyError,InvalidOperation,TypeError):continue
                 step_times[step]=max(step_times.get(step,Decimal(0)),duration)
         sources.append({'rank':source['rank'],'file':str(csv_path),'kind':'step_csv_us'})
+    micro=micro_configuration(Path(report['profiling_path']),rows,log_dir)
+    for key,field in FIELDS.items():
+        vals=values[key]
+        if not vals:vals.update(micro['mesh_args'].get(field,[]))
     summary={key:next(iter(vals)) if len(vals)==1 else None for key,vals in values.items()}
     for key,vals in values.items():
         if len(vals)>1:warnings.append(f'{key}配置来源冲突，保持未知')
-    micro=micro_configuration(Path(report['profiling_path']),rows,log_dir)
     summary['MBN']=micro['expected_mbn']
     warnings.extend(micro['warnings']);sources.extend(micro['sources'])
     return {'summary':summary,'step_time_us':{step:format(value,'f') for step,value in step_times.items()},

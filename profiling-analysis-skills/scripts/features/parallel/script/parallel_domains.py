@@ -20,6 +20,8 @@ from global_communication import (identify_global_group, is_global_name,
 
 from parallel_domain_registry import STAGE_DOMAINS as DOMAINS
 from mindspeed_domains import model_evidence, initialization_roles
+from hyperparallel_domains import (candidate_axes, causal_group_usages, corroborated_axis,
+                                   exported_group_ids, mesh_evidence, single_pipeline_stage)
 CONFIG_FIELDS = {'TP': 'tensor_model_parallel_size', 'CP': 'context_parallel_size',
                  'DP': 'data_parallel_size', 'EP': 'expert_model_parallel_size',
                  'PP': 'pipeline_model_parallel_size'}
@@ -278,15 +280,28 @@ def build_domain_reports(profiling: Path, ranks: list[dict], pp_report: dict,
         warnings.extend(local_warnings)
         rows.append(data)
     evidence=model_evidence(profiling,log_dir)
+    meshes=mesh_evidence(profiling,log_dir)
+    mesh_single_stage=bool(meshes) and single_pipeline_stage(profiling,log_dir) and not any(stage_map.values())
     initialization,initialization_audit=initialization_roles(rows,profiling,evidence)
     _dump(output_dir/'domains/initialization_evidence.json',initialization_audit)
     catalog, role_evidence = {}, defaultdict(list)
     all_events = []
+    runtime_sizes=defaultdict(set)
+    export_ids=defaultdict(set)
+    causal_usages=defaultdict(Counter)
     pp_group_ids = {g['group_id'] for g in pp_report.get('groups', []) if g.get('kind') == 'pp'}
     pp_event_ids = {e.get('event_id', f"{e['rank']}:{e['ordinal']}") for e in pp_report.get('events', [])}
     origin = Decimal(str(pp_report.get('time_origin_us', 0)))
     for data in rows:
         rank = int(data['rank'])
+        trace=source_map.get(rank,{}).get('trace')
+        if trace:
+            for identity, ids in exported_group_ids(data['events'],Path(trace).with_name('communication.json')).items():
+                export_ids[identity].update(ids)
+            if meshes:
+                index=output_dir/f'timeline_cache/raw_rank_{rank}.json.gz'
+                for identity, counts in causal_group_usages(data['events'],index,Path(trace)).items():
+                    causal_usages[identity].update(counts)
         contexts = _event_contexts(data['events'], data.get('contexts', []))
         roles, reasons = _resolve_roles(data, contexts, {'communication_group_roles': overrides})
         _tp_cp_roles(data, contexts, _sizes({}, data['metadata']), roles, reasons)
@@ -342,6 +357,12 @@ def build_domain_reports(profiling: Path, ranks: list[dict], pp_report: dict,
             if group_id not in catalog:
                 catalog[group_id] = {'group_id': group_id, 'members': [], 'aliases': [], 'observed_on_ranks': [rank],
                                      'classification_evidence': [], 'event_count': 0}
+            group=catalog[group_id]
+            if rank not in group['observed_on_ranks']:
+                group['observed_on_ranks'].append(rank)
+            size=event.get('args',{}).get('rank_size')
+            if str(size).isdigit() and int(size)>0:
+                runtime_sizes[group_id].add(int(size))
             names = contexts[i]
             category = None
             if 'allreduce' in event['name'].casefold() and not any(LOG_CONTEXT.search(n) for n in names) and any(GRAD_CONTEXT.search(n) for n in names):
@@ -358,6 +379,31 @@ def build_domain_reports(profiling: Path, ranks: list[dict], pp_report: dict,
         candidates = {role for role, _ in role_evidence[group_id]}
         role = next(iter(candidates)) if len(candidates) == 1 and 'unresolved' not in candidates else 'unresolved'
         reasons = sorted({reason for _, reason in role_evidence[group_id] if reason})
+        if len(export_ids[group_id])==1:
+            group['export_group_id']=next(iter(export_ids[group_id]))
+        sizes_seen=runtime_sizes[group_id]
+        usages=causal_usages[group_id]
+        if usages:
+            group['causal_usages']=dict(sorted(usages.items()))
+            if set(usages)=={'gradient_clip'} and usages['gradient_clip']==group['event_count']:
+                group['explicit_purpose']='梯度裁剪'
+                reasons.append('全组已采集事件通过 HCCL 异步连线关联到梯度裁剪')
+        if len(sizes_seen)==1:
+            size=next(iter(sizes_seen))
+            group['observed_rank_size']=size
+            candidates=candidate_axes(meshes,group['observed_on_ranks'],size,group['members'])
+            if candidates:
+                group['mesh_candidates']=[{'axis':axis,'domain':domain} for axis,domain in candidates]
+                reasons.append('DeviceMesh 候选轴：'+', '.join(axis for axis,_ in candidates))
+            if mesh_single_stage and not role_evidence[group_id] and usages:
+                supported=corroborated_axis(meshes,group,size,usages)
+                if supported:
+                    axis,role,members=supported
+                    group['members']=members
+                    group['members_basis']='DeviceMesh 轴切片与运行时调用证据印证'
+                    group['mesh_axis']=axis
+                    reasons.append(f'HyperParallel {axis}：显式 DeviceMesh、实测参与数及异步 HCCL 调用链一致')
+                    for rank in members:stage_map.setdefault(rank,0)
         member_stages = {stage_map[r] for r in group['members'] if r in stage_map}
         all_member_stages_known = bool(group['members']) and all(r in stage_map for r in group['members'])
         pp_stage = next(iter(member_stages)) if len(member_stages) == 1 and all_member_stages_known else None
@@ -373,12 +419,16 @@ def build_domain_reports(profiling: Path, ranks: list[dict], pp_report: dict,
             available_ranks=sorted(set(group['members']) & sampled),
             missing_ranks=sorted(set(group['members']) - sampled),
             unexpected_ranks=unexpected,
-            complete=set(group['members']) <= sampled,
+            complete=bool(group['members']) and set(group['members']) <= sampled,
             classification_reason='; '.join(reasons) or 'no semantic metadata or corroborated runtime role',
             observed_on_ranks=sorted(set(group['observed_on_ranks'])))
     for event in all_events:
         group = catalog[event['group_id']]
         event.update(domain=group['domain'],domain_aliases=group.get('domain_aliases',[]),classification_reason=group['classification_reason'])
+        if group.get('mesh_axis') and event['stage'] is None:
+            event['stage']=event['pp_stage']=group['pp_stage']
+        if group.get('explicit_purpose'):
+            event['purpose_category']=group['explicit_purpose']
         if event['domain'] == 'GLOBAL':
             event['source_metric_category'] = event.get('metric_category')
             event['purpose_category'], event['purpose_reason'] = purpose_of_event(event)

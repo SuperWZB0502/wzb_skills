@@ -1,7 +1,6 @@
 """Local workflow utilities. Each feature ships its own copy; no cross-feature imports."""
 from contextlib import contextmanager
 from datetime import datetime, timezone
-import fcntl
 import gc
 import sys
 import contextlib
@@ -11,6 +10,9 @@ import os
 from pathlib import Path
 import re
 import time
+
+sys.path.append(str(Path(__file__).resolve().parents[3]))
+from report_lock import output_lock as lock_file
 
 class InputProblem(ValueError):
     def __init__(self, message, status='unsupported'):
@@ -85,14 +87,6 @@ def default_output(feature, probe):
     path=Path(probe['profiling']);name=path.parent.name if path.name=='profiling' else path.name
     name=re.sub(r'[^\w.-]+','_',name)[:64]+'_'+digest(str(path))[:8]
     return Path(feature)/'output/runs'/name
-
-@contextmanager
-def lock_file(path):
-    path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
-    with path.open('a') as handle:
-        fcntl.flock(handle,fcntl.LOCK_EX)
-        try:yield
-        finally:fcntl.flock(handle,fcntl.LOCK_UN)
 
 def update_section(path, start, end, section):
     path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)

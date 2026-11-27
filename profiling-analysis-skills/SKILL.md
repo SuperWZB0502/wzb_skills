@@ -1,15 +1,15 @@
 ---
 name: wzb-profiling-analysis
-description: 用于分析已导出的Ascend、MindSpore、PyTorch TEXT profiling，生成全局总览和并行通信图的离线HTML，或查询已有报告中的算子、时间区间、I/O、通信域和调用栈证据。
+description: 分析已导出的 Ascend、MindSpore、PyTorch Profiling，生成全局总览、并行通信图和中文算子详情的离线 HTML。可单独分析 TEXT 算子 CSV 或兼容的 Ascend Profiling DB，也可查询已有报告的时间区间、算子和通信证据。
 ---
 
 # Profiling分析
 
-使用随附Python入口完成输入识别、数据解析、校验、模板注入、功能拼装和HTML交付。首次使用不需要Agent阅读源码、识别通信域、生成前端或手工拼接HTML，脚本不调用模型服务。页面样式、颜色、交互、默认项和水印由打包的源模板决定。
+统一 Python 入口完成输入识别、解析、校验和离线 HTML 拼装。Agent 执行入口并读取结果状态。页面样式、交互和默认项由技能内的模板决定。
 
 ## 生成报告
 
-`SKILL_DIR`为本SKILL.md所在目录，入口可在任意工作目录执行。需要Linux、Python 3.10+、ijson；缺依赖时执行：
+`SKILL_DIR` 为本 SKILL.md 所在目录，入口可在任意工作目录执行。需要 Python 3.10+ 和 ijson，支持 Linux 和 Windows。
 
 ```bash
 python3 -m pip install -r "$SKILL_DIR/scripts/requirements.txt"
@@ -23,15 +23,15 @@ python3 "$SKILL_DIR/scripts/run_analysis.py" \
   --output-dir "/path/to/analysis-result"
 ```
 
-默认生成全局总览、并行通信图和`analysis-result/report.html`。支持任务目录、profiling目录、单卡采集目录及`ASCEND_PROFILER_OUTPUT`。每份输入使用独立输出目录；重复执行沿用该目录。输入路径缺失时询问用户，不使用开发样例代替。
+默认将全局总览、训练并行时间轴和算子详情合并为 `analysis-result/report.html`。支持任务目录、逐卡采集目录和含单个 Device_id 的平铺 `ASCEND_PROFILER_OUTPUT`。平铺导出所需的输入副本由脚本自动准备，卡号依据写入结果状态。每份输入使用独立输出目录，重复执行沿用该目录。
 
-按用户已提供的信息添加参数：`--step 5`限制Step；`--log-dir /path/to/run_log`补充日志；`--workers N`手动控制逐卡并发（省略则自动选择）；`--html /path/to/report.html`指定报告位置；`--features overview|parallel`只执行一个功能。默认全Step、两个功能；并发按CPU配额、可用内存和实采卡数自动选择，最多8进程，`--workers N`可手动指定；配置从元数据和日志读取，不根据目录名猜测。
+用 `--features overview|parallel|operator` 运行单个功能。`--step 5` 限制 Step，缺省使用全部 Step。用 `--html /path/to/report.html` 指定页面位置。平铺导出旁的 `logs/` 可自动发现，另存时使用 `--log-dir /path/to/logs`。`--workers N` 可为前两个功能覆盖自动并发数。
 
-首次完整分析先用一次原始trace扫描供给两个功能各自的缓存，再自动执行必要数据校验，并用Python把本次成功的功能页面按固定顺序拼装为新HTML，不读取旧目标HTML作为素材。Agent只执行命令、读取状态、返回链接；不用另写页面或合并代码。
+首次完整分析原始 trace 扫描一次，供全局总览和并行通信图共用。只需算子详情或输入是算子 CSV、Ascend Profiling DB 时，使用 `--features operator`。算子详情读取 kernel 明细或 DB，页面按卡提供四种分组和全量 CSV。统一入口校验数据，并按固定顺序拼装本次成功的功能页面。
 
 ## 交付
 
-读取输出根目录的`workflow.json`、`summary.md`，交付其中的HTML路径及实际限制。无需把大体积JSON或原始trace读入上下文。
+读取输出根目录的 `workflow.json` 和 `summary.md`。交付根目录的 `report.html` 和实际限制。拼装入口会清理本机输入、日志和输出路径。保留工作流和分析文件用于复现。
 
 - `complete`：正常交付。
 - `partial`且返回码为0：数据有缺失或语义未知，报告已经自动生成，可直接交付并说明限制；首次生成不需要Agent先解决未知项。
@@ -65,7 +65,7 @@ python3 "$SKILL_DIR/scripts/query_evidence.py" \
 
 需要时读取：
 
-- [技能介绍和两个功能预览](README.md)：向用户展示用途和实际界面时读取。
+- [技能介绍和功能预览](README.md)：向用户展示用途和实际界面时读取。
 
 - [功能和固定交互](references/features.md)：当前页面、配色及交互规则。
 - [数据口径](references/data-semantics.md)：字段来源、未知项及性能统计边界。

@@ -27,7 +27,17 @@ def validate(output_dir):
             check(D(row['端到端时间'])==sum((D(row[k]) for k in ('计算','未掩盖通信','Free')),D(0)),f'{identity}端到端公式错误')
             values=comm.get('per_step_rank',{}).get(step,{}).get(str(identity[0]),{})
             if values:
-                check(abs(sum((D(v) for v in values.values()),D(0))-D(row['总通信']))<=D('.01'),f'{identity}通信分类未闭合')
+                classified = sum((D(v) for v in values.values()), D(0))
+                evidence = comm.get('checks', {}).get(step, {}).get(str(identity[0]))
+                tolerance = D('.01')
+                if evidence:
+                    interval_union = D(evidence['interval_union_us'])
+                    overlap = D(evidence['overcount_us'])
+                    check(abs(classified - D(evidence['duration_sum_us'])) <= tolerance, f'{identity}通信分类与事件累计不同')
+                    check(overlap >= 0 and abs(classified - interval_union - overlap) <= tolerance, f'{identity}重叠耗时证据不闭合')
+                    check(abs(interval_union - D(row['总通信'])) <= tolerance, f'{identity}通信区间并集与原始总通信不同')
+                else:
+                    check(abs(classified - D(row['总通信'])) <= tolerance, f'{identity}通信分类未闭合')
             if row.get('bubble') is not None:
                 check(D(row['bubble'])==D(row['PP'])+D(row['Grad AR']),f'{identity}bubble公式错误')
                 check(D(row['有效耗时'])==D(row['端到端时间'])-D(row['bubble']),f'{identity}有效耗时公式错误')

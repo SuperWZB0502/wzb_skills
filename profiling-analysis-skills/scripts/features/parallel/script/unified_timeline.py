@@ -106,7 +106,7 @@ def build_unified_report(pp_report, domain_reports, streams, markers=None):
     ] + list(streams.get('notes', [])) + list(markers.get('notes', []))
     return {
         'schema_version': 1, 'feature_id': 'unified-parallel-timeline', 'mode': 'unified',
-        'domain': 'UNIFIED', 'title': '5D并行通信图', 'domains': list(display_domains), 'includes_unresolved':True,
+        'domain': 'UNIFIED', 'title': '训练并行时间轴', 'domains': list(display_domains), 'includes_unresolved':True,
         'time_unit': 'us', 'time_origin_us': pp_report['time_origin_us'],
         'profiling_path': pp_report.get('profiling_path'),
         'generated_at': datetime.now(timezone.utc).astimezone().isoformat(timespec='seconds'),

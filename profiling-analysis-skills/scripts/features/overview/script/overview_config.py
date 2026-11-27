@@ -13,6 +13,10 @@ from decimal import Decimal, InvalidOperation
 import json
 from pathlib import Path
 import re
+import sys
+
+sys.path.append(str(Path(__file__).resolve().parents[3]))
+from training_log import mesh_training_arguments
 
 
 SUMMARY_KEYS = {
@@ -109,6 +113,9 @@ def collect_config(profiling: Path, rank_folders: dict[int, Path], log_dir=None)
             warnings.append(f'训练日志 {key} 不一致，保留为空')
             return None
         return values[0]
+
+    for key,records in mesh_training_arguments(log_root).items():
+        arguments.setdefault(key,[]).extend(records)
 
     for label, key in SUMMARY_KEYS.items():
         records = [(rank, data.get('distributed_args', {}).get(key))
