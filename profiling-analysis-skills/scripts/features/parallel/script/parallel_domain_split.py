@@ -273,13 +273,14 @@ def render_sections(report,domain_reports=None,unified_report=None):
     """Render one unified graph, retaining the original PP-only renderer."""
     if unified_report is not None:
         from timeline_payload import encode_report
-        template=(FEATURE_DIR/'script/parallel_timeline.html').read_text(encoding='utf-8')
+        from render_parallel import timeline_section
+        from layer_markers import collect_layer_regions
         from presentation_summary import collect_summary,encode_summary
         from operator_details import build_details,encode_details
         detail_data=build_details(report,iter(unified_report.get('events',[])))
         encoded=encode_report(unified_report,detail_data.get('compute_event_refs',{}))
         details=encode_details(detail_data,embedded_refs=True)
-        return template.replace('__DATA__',encoded).replace('__SUMMARY__',encode_summary(collect_summary(report))).replace('__DETAILS__',details).replace('__COLUMN_UI__',(Path(__file__).with_name('compact_timeline.js')).read_text(encoding='utf-8')).replace('__DETAIL_UI__',(FEATURE_DIR/'script/detail_panels.js').read_text(encoding='utf-8'))
+        return timeline_section(encoded,encode_summary(collect_summary(report)),details,collect_layer_regions(unified_report))
     template=(FEATURE_DIR/'script/parallel_domain_split.html').read_text(encoding='utf-8')
     sections=[]
     for domain,payload in [('PP',report)]+[(d,domain_reports[d]) for d in DOMAIN_ORDER[1:] if domain_reports and d in domain_reports]:

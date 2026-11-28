@@ -4,9 +4,29 @@
   "description": "正式运行脚本、模板、JS及统一生成入口；不包含profiling或历史缓存。source为来源说明，不是运行时依赖。",
   "files": [
     {
+      "packaged": "scripts/features/parallel/script/layer_markers.py",
+      "source": "skill-local",
+      "sha256": "9a38c3bf2784eb3ad50a3316000499d38fe86f82e426e0d2a41ebe6fd48be613"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/mindstudio_timeline.json",
+      "source": "skill-local",
+      "sha256": "8b6df811e975a1a79577467d08e89d1879394aa08b7fe408bc5406e5bdbedd98"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/sync_mindstudio_timeline.py",
+      "source": "skill-local",
+      "sha256": "03bbbdf26fa1f3fa2d3a8451dc498225714e448a3902e9c938327e36d64ad0d5"
+    },
+    {
+      "packaged": "scripts/features/parallel/script/timeline_interactions.js",
+      "source": "skill-local",
+      "sha256": "9d19193346a9ff0a5351975990c3970ca36c71abf98fe71d3c908714760b9bf8"
+    },
+    {
       "packaged": "scripts/assemble_report.py",
       "source": "skill-local",
-      "sha256": "3eb9c5f6330bccdc10b95569f30c1246ab6b2fcb84deff361debbdf93aeac4c3"
+      "sha256": "1b640b4425d27e073230f158fa48745033bb105519ae67b5bf1caada31ecb8b1"
     },
     {
       "packaged": "scripts/benchmark_html.py",
@@ -106,7 +126,7 @@
     {
       "packaged": "scripts/features/parallel/script/browser_check.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/browser_check.py",
-      "sha256": "fc858faf95ccdf348de94576b6fa731dc2dc61a3e85b8eab8c5b44de3249655f"
+      "sha256": "6f9a04533b2491c23935a16d8eb905105b2d31a8bf69710277215403d2b36c82"
     },
     {
       "packaged": "scripts/features/parallel/script/compact_timeline.js",
@@ -121,7 +141,7 @@
     {
       "packaged": "scripts/features/parallel/script/detail_panels.js",
       "source": "msinsight调研/功能02_5D并行通信图/script/detail_panels.js",
-      "sha256": "dc0fb00ef7a61cc52eb885d81abbb77e1ae88f29eb20987265cde960e5aab358"
+      "sha256": "c8cdfc45b4ec21e96837e639ab4cbe8501f5de87c3fb9c5c40111209cac6b1bf"
     },
     {
       "packaged": "scripts/features/parallel/script/domain_trace.py",
@@ -171,12 +191,12 @@
     {
       "packaged": "scripts/features/parallel/script/parallel_domain_split.html",
       "source": "msinsight调研/功能02_5D并行通信图/script/parallel_domain_split.html",
-      "sha256": "9885e2a49ecd63c6e4d21f5e12a0773ec19025e6411c15343ed2519de217f7b4"
+      "sha256": "1dd393577d996316a89e8812eff9cfeec7dcd50cbdcd18b45e77c853050ab381"
     },
     {
       "packaged": "scripts/features/parallel/script/parallel_domain_split.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/parallel_domain_split.py",
-      "sha256": "5f49afe4f38b66515c22b0d864a83a6dacd010c4b820fcdd7ee251e5fc14caf9"
+      "sha256": "06c568241737dcc386b61e89f0ae5693d205613cdd9bafe99f55d15eb26cb80e"
     },
     {
       "packaged": "scripts/features/parallel/script/parallel_domains.py",
@@ -186,7 +206,7 @@
     {
       "packaged": "scripts/features/parallel/script/parallel_timeline.html",
       "source": "msinsight调研/功能02_5D并行通信图/script/parallel_timeline.html",
-      "sha256": "434383614b0f640c2366847d0c0d8572e1b158d2fd96fe9416a249e78ad97df1"
+      "sha256": "f1d278c35d826ef462c85e25067c84fe2179fda7a2f0d1aa847030f23d5cde14"
     },
     {
       "packaged": "scripts/features/parallel/script/parallel_workers.py",
@@ -211,7 +231,7 @@
     {
       "packaged": "scripts/features/parallel/script/presentation_summary.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/presentation_summary.py",
-      "sha256": "c1e922a9340682f9e2e70285945d229d4ad7a14bcb53ce4ac47080e03e64965d"
+      "sha256": "d28c3d94ba7904dd3a2a603a645c939a0bc68ce244414770a8b9cfbb3a84eee2"
     },
     {
       "packaged": "scripts/features/parallel/script/query_evidence.py",
@@ -226,7 +246,7 @@
     {
       "packaged": "scripts/features/parallel/script/render_parallel.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/render_parallel.py",
-      "sha256": "23c1fb80896410f6b747b86e28f2cca6a71019bbe3e893b1a0535e4d3466b3a6"
+      "sha256": "6090db3af941e518abd5b47af03f75c02166084e493fcb7e0aa8413f861cbd85"
     },
     {
       "packaged": "scripts/features/parallel/script/run_parallel.py",

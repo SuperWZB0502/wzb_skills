@@ -10,7 +10,7 @@
 - CommunicationRapidSaxHandler.cpp、SingleRankCommunicationJsonParser.cpp的通信时间/带宽读取；CommunicationMatrixRapidHandler.cpp的端点、传输类型、统计字段读取。
 - MindSpore/CANN已知导出字段、flow与TLV schema；仅在已确认格式和证据边界内使用。
 
-独立Python脚本并非原仓库同名脚本的直接运行；它们是对字段、确定性算法与真实证据链的封装。PP载荷证明、micro/r/opt、级联筛选、Ctrl框选重组泳道与时间窗、HTML编排等包含独立扩展。原数据缺失不会由这些扩展补造。
+独立 Python 脚本封装上游字段、确定性算法与原始证据链。PP 载荷证明、micro/r/opt、级联筛选、二维框选的泳道重组及 HTML 编排由本项目适配。
 
 原msinsight代码采用Mulan PSL v2；上游仓库为https://gitcode.com/Ascend/msinsight 。本技能没有打包整个上游仓库、开发样例profiling、原始trace或历史分析缓存。需要核对原工具时按上述文件/函数定位；相应源码快照和更长的研发审计保留在原调研工作区。
 
@@ -25,3 +25,20 @@
 性能优化工程包括一次原始扫描、分块JSON缓存、小型派生索引、局部GC控制和资源并发预算。它们封装既有提取规则，未改变时间精度、通信语义或字段来源。后端处理和模板与开发工作目录同步；性能实验及核对摘要见performance.md和performance-results.json，运行时不读取实验目录。
 
 HTML列式压缩由本项目独立实现，位于compact_timeline.py/js与timeline_payload.py。它只改变HTML传输和浏览器内存布局，不改上游通信归域、算子关联、统计口径或canonical JSON/CSV。时间使用精确十进制字符串的可逆整数编码；绘图浮点值与旧版Number(原始时间文本)一致。validate_html_payload.py可逐条与本次canonical产物核对，benchmark_html.py用于可选浏览器实测。
+
+## 时间轴交互源码
+
+适配基于 MindStudio Insight 提交 `2cd7b16e2d77d7f2bf15ae7e1bee0f112f108e79`。
+
+- `modules/timeline/src/components/TimelineMarker.tsx` 的 `FLAG_PATH`、`transformTimeToLeft`、`addNewFlag` 提供原始旗形、时间投影和点标记排序。默认色板来自 `modules/timeline/src/entity/timeMaker.tsx`。
+- `modules/timeline/src/components/charts/ChartInteractor/actions.ts` 的双端点选区与按钮命中规则，以及 `modules/timeline/src/actions/actionZoomIntoSelection.ts`、`actionZoom.ts` 的选区放大、回退和重置，接入报告既有的二维泳道过滤。区间命名、单击和双击区分、按钮四角避让及 Esc 连按由本项目扩展。
+- `server/src/modules/defs/DbSqlDefs.h` 的 `fwdbwd`、`async_npu` 分类及 `server/src/modules/timeline/core/dataEngine/PythonApiRepo.cpp` 的序列字段为逐层标注提供依据。TEXT 适配器结合模型显式层标记、原始 flow 和设备事件，保留无法归属的区间。
+
+生成和验证固定版本的旗形资源。
+
+```bash
+python3 "$SKILL_DIR/scripts/features/parallel/script/sync_mindstudio_timeline.py" /path/to/msinsight
+python3 "$SKILL_DIR/scripts/features/parallel/script/sync_mindstudio_timeline.py" /path/to/msinsight --check
+```
+
+运行报告生成时使用随包的资源，无需下载或构建 MindStudio。逐层归属缓存在 `parallel/layer_markers.json` 并嵌入离线 HTML。

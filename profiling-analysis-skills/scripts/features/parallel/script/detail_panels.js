@@ -10,7 +10,15 @@ function mfuText(value,partial=false){return value==null?'-':(partial?'≥ ':'')
 function recordFor(event){if(operatorDetails.compute_refs_embedded)return event._detail_record>=0?operatorDetails.compute_records?.[event._detail_record]:null;const ref=computeRefFor(event);return ref?operatorDetails.compute_records?.[ref[0]]:null;}
 function eventPerformance(event){const performance=recordFor(event)?.performance,raw=performance?.flops,flops=raw==null?null:Number(raw),peak=operatorDetails.hardware?.[String(event.rank)]?.peak_flops,mfu=flops!=null&&peak>0&&event._duration>0?flops/(event._duration/1e6*peak)*100:null;return{flops,mfu,basis:performance?.basis||'未采集或未唯一关联计算量证据',peak};}
 function summarizeCompute(events,start,end,ranksInScope=null){const candidates=events.filter(e=>e.kind==='compute'&&e._end>=start&&e._start<=end),compute=candidates.filter(e=>e._start>=start&&e._end<=end),boundary=candidates.length-compute.length,sampled=new Set(ranksInScope||candidates.map(e=>Number(e.rank)));let flops=0,known=0;for(const event of compute){const value=eventPerformance(event).flops;if(value!=null){flops+=value;known++;}}let peak=0,allPeaks=true;for(const rank of sampled){const value=operatorDetails.hardware?.[String(rank)]?.peak_flops;if(!(value>0))allPeaks=false;else peak+=Number(value);}return{flops:known?flops:null,known,total:compute.length,partial:known<compute.length||boundary>0,boundary,mfu:known&&allPeaks&&peak>0&&end>start?flops/((end-start)/1e6*peak)*100:null,start,end,ranks:[...sampled],peak};}
-function regionPerformance(region){if(!regionPerformanceCache.has(region.region_id)){const start=Number(region.display_start_us??region.start_us),end=Number(region.display_end_us??region.end_us),events=(eventsByStep.get(String(region.step))||[]).filter(e=>e.kind==='compute'&&Number(e.rank)===Number(region.rank));regionPerformanceCache.set(region.region_id,summarizeCompute(events,start,end,[Number(region.rank)]));}return regionPerformanceCache.get(region.region_id);}
+function regionPerformance(region){
+ if(!regionPerformanceCache.has(region.region_id)){
+  const start=Number(region.display_start_us??region.start_us),end=Number(region.display_end_us??region.end_us);
+  const ids=region.model_role?new Set(region.event_ids):null;
+  const events=(eventsByStep.get(String(region.step))||[]).filter(e=>e.kind==='compute'&&Number(e.rank)===Number(region.rank)&&(!ids||ids.has(String(e.event_id))));
+  regionPerformanceCache.set(region.region_id,summarizeCompute(events,start,end,[Number(region.rank)]));
+ }
+ return regionPerformanceCache.get(region.region_id);
+}
 function performanceNote(stats){return '计算量已知 '+stats.known+'/'+stats.total+' 个计算算子'+(stats.partial?'；含未知项，≥ 表示已知部分下界':'')+(stats.boundary?'；另有 '+stats.boundary+' 个跨边界计算事件未分摊FLOPs':'')+'。区间MFU = 已知FLOPs ÷ (区间时长 × 涉及实采卡BF16/FP16峰值之和)，不相加百分比，不外推未采集卡。';}
 function tensorSlots(raw){const value=String(raw??'').trim().replace(/^"|"$/g,'');return !value||value==='N/A'?[]:value.split(';').map(v=>v.trim());}
 function ioTable(target,record,direction){
@@ -26,9 +34,9 @@ function communicationTransportRows(detail){return detail.transports?.length?det
 function communicationBandwidthText(detail){const rows=communicationTransportRows(detail);return rows.length?rows.map(row=>row.transport+': '+bandwidthText(row['Bandwidth(GB/s)'])).join('; '):detail.bandwidth_observed?'未记录有效传输':'-';}
 function commDuration(value){return detailValue(value)==='-'||!Number.isFinite(Number(value))?'-':time(Number(value)*1000);}
 function communicationOverview(target,event){
- const detail=operatorDetails.communication?.[String(event.event_id)],values=[stageOf(event.rank),event.rank,kindNames[event.kind],eventDomains(event).join(' / '),groupLabel(groupMap.get(String(event.group_id))),time(event._start),commDuration(detail?.time?.['Transit Time(ms)']),commDuration(detail?.time?.['Wait Time(ms)']),time(event._duration),time(event._end)];
+ const detail=operatorDetails.communication?.[String(event.event_id)],values=[stageOf(event.rank),event.rank,kindNames[event.kind],eventDomains(event).join(' / '),groupLabel(groupMap.get(String(event.group_id))),time(event._start),time(event._end),commDuration(detail?.time?.['Transit Time(ms)']),commDuration(detail?.time?.['Wait Time(ms)']),time(event._duration)];
  const table=detailTable(target,'总览：',[],[values],{detailOverview:'true',communicationOverview:'true'}),head=table.tHead,upper=document.createElement('tr'),lower=document.createElement('tr');
- for(const label of ['Stage','Rank','事件类型','通信域','通信组','起始','持续','结束']){const cell=detailElement('th',label);if(label==='持续'){cell.colSpan=3;cell.scope='colgroup';}else{cell.rowSpan=2;cell.scope='col';}upper.append(cell);}for(const label of ['传输','等待','总计']){const cell=detailElement('th',label);cell.scope='col';lower.append(cell);}head.replaceChildren(upper,lower);
+ for(const label of ['Stage','Rank','事件类型','通信域','通信组','起始','结束','持续时间']){const cell=detailElement('th',label);if(label==='持续时间'){cell.colSpan=3;cell.scope='colgroup';}else{cell.rowSpan=2;cell.scope='col';}upper.append(cell);}for(const label of ['传输','等待','总计']){const cell=detailElement('th',label);cell.scope='col';lower.append(cell);}head.replaceChildren(upper,lower);
 }
 function renderCommunication(target,event){
  const detail=operatorDetails.communication?.[String(event.event_id)]||{},group=groupMap.get(String(event.group_id)),members=detail.members?.length?detail.members:group?.members||[],collective=/allgather|alltoall|allreduce|reducescatter|broadcast/.test(event.name.toLowerCase().replace(/[^a-z]/g,'')),endpoints=detail.endpoints||[],send=endpoints.map(row=>row.source_rank),recv=endpoints.map(row=>row.target_rank);
@@ -44,26 +52,48 @@ function renderCommunication(target,event){
 }
 function renderSubject(target,subject,hover=false){target.replaceChildren();if(hover)target.style.width='max-content';const isRegion=!!subject?.region_id,isRange=subject?.kind==='range',isEvent=subject?.event_id!=null;let title='当前视窗',start=viewStart,end=viewEnd,subjectRanks=orderedRanks(),stats=null;const headers=[],values=[];const add=(name,value)=>{headers.push(name);values.push(value);};
  if(isEvent){title=subject.name;start=subject._start;end=subject._end;subjectRanks=[Number(subject.rank)];}
- if(isRegion){title=subject.label+' · '+(subject.phase==='f'?'前向':subject.phase==='b'?'反向':subject.phase==='r'?'逐层重计算':'优化器更新');start=Number(subject.display_start_us??subject.start_us);end=Number(subject.display_end_us??subject.end_us);subjectRanks=[Number(subject.rank)];if(subject.phase!=='opt')stats=regionPerformance(subject);}
+ if(isRegion){title=(subject.model_role?subject.model_role+' ':'')+subject.label+' · '+(subject.phase==='f'?'前向':subject.phase==='b'?'反向':subject.phase==='r'?'逐层重计算':'优化器更新');start=Number(subject.display_start_us??subject.start_us);end=Number(subject.display_end_us??subject.end_us);subjectRanks=[Number(subject.rank)];if(subject.phase!=='opt')stats=regionPerformance(subject);}
  if(isRange){title='框选范围';start=subject.start;end=subject.end;subjectRanks=subject.ranks;stats=summarizeCompute(subject.events,start,end,subjectRanks);}
  if(stats&&!stats.total)stats=null;target.append(detailElement('div',title,'detail-title'));
  const isCommunication=isEvent&&subject.kind==='communication';
- if((isEvent||isRegion||isRange)&&!isCommunication){add('Stage',[...new Set(subjectRanks.map(rank=>stageOf(rank)??'?'))].join(', '));add('Rank',subjectRanks.join(', '));if(isEvent)add('事件类型',kindNames[subject.kind]);if(isEvent&&subject.kind==='communication'){add('通信域',eventDomain(subject));add('通信组',groupLabel(groupMap.get(String(subject.group_id))));}add('起始',time(start));add('持续',time(end-start));add('结束',time(end));}
+ if((isEvent||isRegion||isRange)&&!isCommunication){add('Stage',[...new Set(subjectRanks.map(rank=>stageOf(rank)??'?'))].join(', '));add('Rank',subjectRanks.join(', '));if(isEvent)add('事件类型',kindNames[subject.kind]);if(isEvent&&subject.kind==='communication'){add('通信域',eventDomain(subject));add('通信组',groupLabel(groupMap.get(String(subject.group_id))));}add('起始',time(start));add('结束',time(end));add('持续时间',time(end-start));}
  if(isEvent&&subject.kind==='compute'){const p=eventPerformance(subject);add('FLOPs',flopText(p.flops));add('MFU',mfuText(p.mfu));}
  if(stats){add('总FLOPs',flopText(stats.flops,stats.partial));add('总MFU',mfuText(stats.mfu,stats.partial));}
- if(!subject){for(const [label,field,value] of [['起始','start',viewStart],['持续','duration',viewEnd-viewStart],['结束','end',viewEnd]]){const cell=detailElement('span',time(value));cell.dataset.viewField=field;add(label,cell);}}
+ if(!subject){for(const [label,field,value] of [['起始','start',viewStart],['结束','end',viewEnd],['持续时间','duration',viewEnd-viewStart]]){const cell=detailElement('span',time(value));cell.dataset.viewField=field;add(label,cell);}}
  if(isCommunication)communicationOverview(target,subject);else detailTable(target,'总览：',headers,[values],{detailOverview:'true'});
  if(isEvent&&subject.kind==='compute'){const record=recordFor(subject),ref=computeRefFor(subject);if(record){ioTable(target,record,'输入');ioTable(target,record,'输出');target.append(detailElement('p','来源：kernel_details.csv 第 '+ref[1]+' 行。','detail-note'));}target.append(detailElement('p',eventPerformance(subject).basis+'；MFU按本卡BF16/FP16模型峰值归一化，非硬件PMU利用率。','detail-note'));}
  if(isEvent&&subject.kind==='communication')renderCommunication(target,subject);
  if(stats)target.append(detailElement('p',performanceNote(stats),'detail-note'));
- if(isRegion&&subject.basis&&!hover)target.append(detailElement('p',subject.basis,'detail-note'));
+ if(isRegion&&subject.model_role)target.append(detailElement('p','已归层设备算子 '+subject.kernel_count+' 个 · '+subject.basis,'detail-note'));
+ else if(isRegion&&subject.basis&&!hover)target.append(detailElement('p',subject.basis,'detail-note'));
  if(!subject&&!hover)target.append(detailElement('p','单击算子或计算标注查看详情；框选可复制Stage/Rank与时间区间。','detail-note'));
 }
 function updateDetailView(){for(const [field,value]of [['start',viewStart],['duration',viewEnd-viewStart],['end',viewEnd]]){const cell=q('selection').querySelector('[data-view-field='+field+']');if(cell)cell.textContent=time(value);}}
 function initializeTableChoices(){for(const [type,values,selected,label]of [['kind',kindOrder,selectedTableKinds,key=>kindNames[key]],['prefix',allPrefixes,selectedPrefixes,key=>key]]){const options=q('table-'+type+'-options');for(const value of values){const line=document.createElement('label'),input=document.createElement('input');input.type='checkbox';input.checked=true;input.dataset.tableChoice=type;input.value=value;line.append(input,document.createTextNode(label(value)));input.addEventListener('change',()=>{input.checked?selected.add(value):selected.delete(value);page=1;refreshTableChoiceLabels();updateResults();});options.append(line);}for(const action of ['all','none'])q('table-'+type+'-'+action).addEventListener('click',()=>{selected.clear();for(const input of options.querySelectorAll('input')){input.checked=action==='all';if(input.checked)selected.add(input.value);}page=1;refreshTableChoiceLabels();updateResults();});}refreshTableChoiceLabels();}
 function refreshTableChoiceLabels(){q('table-kind-label').textContent=selectedTableKinds.size+'/'+kindOrder.length;}
 function updatePerformanceTotals(){const a=rangeSelection?.start??viewStart,b=rangeSelection?.end??viewEnd,scopeRanks=rangeSelection?[...new Set(rangeSelection.bands.map(b=>b.rank))]:null,stats=summarizeCompute(visible,a,b,scopeRanks);const target=q('total-performance');target.hidden=!stats.total;target.textContent=stats.total?' · 总FLOPs '+flopText(stats.flops,stats.partial)+' · 总MFU '+mfuText(stats.mfu,stats.partial):'';target.title=performanceNote(stats);target.dataset.known=stats.known;target.dataset.total=stats.total;target.dataset.flops=stats.flops??'';target.dataset.mfu=stats.mfu??'';}
-function initializeGuides(){const button=q('guide-toggle'),panel=q('guide-panel');let layoutFrame=0;function position(){layoutFrame=0;if(panel.hidden)return;const box=button.getBoundingClientRect();panel.style.visibility=box.bottom<=0||box.top>=innerHeight?'hidden':'visible';panel.style.width=Math.min(680,innerWidth-24)+'px';panel.style.left=Math.max(12,Math.min(innerWidth-panel.offsetWidth-12,box.right-panel.offsetWidth))+'px';panel.style.bottom=Math.max(0,innerHeight-box.top+8)+'px';panel.style.maxHeight=Math.max(0,box.top-20)+'px';}function schedule(){if(!layoutFrame)layoutFrame=requestAnimationFrame(position);}button.addEventListener('click',()=>{panel.hidden=!panel.hidden;button.setAttribute('aria-expanded',String(!panel.hidden));position();});document.addEventListener('scroll',schedule,true);window.addEventListener('resize',schedule);q('fullscreen').addEventListener('click',schedule);new MutationObserver(schedule).observe(root,{attributes:true,attributeFilter:['class']});}
+function initializeGuides(){
+ const button=q('guide-toggle'),panel=q('guide-panel');
+ let layoutFrame=0;
+ function position(){
+  layoutFrame=0;
+  if(panel.hidden)return;
+  const anchor=button.getBoundingClientRect();
+  panel.style.visibility=anchor.bottom<=0||anchor.top>=innerHeight?'hidden':'visible';
+  panel.style.width=Math.min(740,innerWidth-24)+'px';
+  panel.style.left=Math.max(12,Math.min(innerWidth-panel.offsetWidth-12,anchor.right-panel.offsetWidth))+'px';
+  const above=anchor.top-20,below=innerHeight-anchor.bottom-20;
+  const nearTop=below>above&&panel.scrollHeight>above;
+  panel.style.top=nearTop?anchor.bottom+8+'px':'auto';
+  panel.style.bottom=nearTop?'auto':Math.max(0,innerHeight-anchor.top+8)+'px';
+  panel.style.maxHeight=Math.max(0,nearTop?below:above)+'px';
+ }
+ function schedule(){if(!layoutFrame)layoutFrame=requestAnimationFrame(position);}
+ button.addEventListener('click',()=>{panel.hidden=!panel.hidden;button.setAttribute('aria-expanded',String(!panel.hidden));position();});
+ document.addEventListener('scroll',schedule,true);window.addEventListener('resize',schedule);
+ q('fullscreen').addEventListener('click',schedule);
+ new MutationObserver(schedule).observe(root,{attributes:true,attributeFilter:['class']});
+}
 
 function renderAggregate(target,aggregate){renderSubject(target,{kind:'range',start:aggregate.start,end:aggregate.end,ranks:[Number(aggregate.rank)],events:[]},true);target.querySelector('.detail-title').textContent='合并 '+aggregate.count+' 个'+kindNames[aggregate.kind]+'事件';target.append(detailElement('p','此处合并显示多个细小事件；放大后可选择单个算子。','detail-note'));}
 

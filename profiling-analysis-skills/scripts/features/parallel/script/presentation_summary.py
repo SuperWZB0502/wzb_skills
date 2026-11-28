@@ -40,7 +40,7 @@ def collect_summary(report, log_dir=None):
                 except (KeyError,InvalidOperation,TypeError):continue
                 step_times[step]=max(step_times.get(step,Decimal(0)),duration)
         sources.append({'rank':source['rank'],'file':str(csv_path),'kind':'step_csv_us'})
-    micro=micro_configuration(Path(report['profiling_path']),rows,log_dir)
+    micro=micro_configuration(Path(report['profiling_path']),rows,log_dir or report.get('model_log_dir'))
     for key,field in FIELDS.items():
         vals=values[key]
         if not vals:vals.update(micro['mesh_args'].get(field,[]))

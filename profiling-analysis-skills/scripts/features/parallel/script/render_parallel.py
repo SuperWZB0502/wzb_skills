@@ -3,6 +3,36 @@ import argparse,json
 from pathlib import Path
 from workflow_support import load_json,write_json,file_state,code_key,digest,update_section
 
+
+def timeline_section(encoded, summary, details, layers):
+    script = Path(__file__).resolve().parent
+    section = (script / 'parallel_timeline.html').read_text(encoding='utf-8')
+    for name, filename in (('__COLUMN_UI__', 'compact_timeline.js'), ('__DETAIL_UI__', 'detail_panels.js'),
+                           ('__INTERACTION_UI__', 'timeline_interactions.js')):
+        section = section.replace(name, (script / filename).read_text(encoding='utf-8'))
+    layer_data = json.dumps(layers, ensure_ascii=False, separators=(',', ':')).replace('<', '\\u003c')
+    marker_data = (script / 'mindstudio_timeline.json').read_text(encoding='utf-8').replace('<', '\\u003c')
+    return (section.replace('__DATA__', encoded).replace('__SUMMARY__', summary)
+            .replace('__DETAILS__', details).replace('__LAYER_DATA__', layer_data)
+            .replace('__MINDSTUDIO_MARKERS__', marker_data))
+
+
+def rendered_layers(output, source, script):
+    from layer_markers import collect_layer_regions
+
+    cached = output / 'layer_markers.json'
+    key = digest({'source': file_state(source), 'code': code_key(script, ['layer_markers.py'])})
+    previous = load_json(cached) if cached.exists() else {}
+    if previous.get('key') == key:
+        return previous['regions']
+    report = load_json(source)
+    regions = collect_layer_regions(report)
+    # An archived report can still render without its raw trace. Retry attribution if it reappears.
+    if regions or not any(str(region.get('source_name','')).startswith('hy106.phase.') for region in report.get('compute_regions', [])):
+        write_json(cached, {'key': key, 'regions': regions})
+    return regions
+
+
 def payload_from_html(path):
     text=Path(path).read_text(encoding='utf-8');marker='<script type="application/json" id="pp-schedule-data">';start=text.index(marker)+len(marker)
     return text[start:text.index('</script>',start)]
@@ -50,7 +80,7 @@ def render(output_dir,html,payload_html=None):
     from operator_details import encode_details
     envelope=json.loads(encoded)
     details=encode_details(detail_data,embedded_refs=envelope.get('detail_refs_embedded',False))
-    section=(script/'parallel_timeline.html').read_text(encoding='utf-8').replace('__DATA__',encoded).replace('__SUMMARY__',encode_summary(presentation)).replace('__DETAILS__',details).replace('__COLUMN_UI__',(script/'compact_timeline.js').read_text(encoding='utf-8')).replace('__DETAIL_UI__',(script/'detail_panels.js').read_text(encoding='utf-8'))
+    section=timeline_section(encoded,encode_summary(presentation),details,rendered_layers(out,source,script))
     update_section(html,START,END,section)
     return {'html':str(Path(html).resolve()),'payload_cache_hit':hit,'payload':str(cached),'operator_details':details_stats}
 if __name__=='__main__':
