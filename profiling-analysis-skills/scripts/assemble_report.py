@@ -79,8 +79,8 @@ def assemble(feature_pages, html, aliases=None):
         if b <= a:
             raise ValueError(f'{name}功能段标记顺序错误')
         section = text[a:b + len(end)]
-        for token in ('__DATA__', '__SUMMARY__', '__DETAILS__', '__DETAIL_UI__', '__COLUMN_UI__',
-                      '__OPERATOR_PAYLOAD__', '__OPERATOR_SCRIPT__'):
+        for token in ('__DATA__', '__SUMMARY__', '__DETAILS__', '__DETAIL_UI__', '__COLUMN_UI__', '__LAYER_DATA__', '__INTERACTION_UI__',
+                      '__MINDSTUDIO_MARKERS__', '__OPERATOR_PAYLOAD__', '__OPERATOR_SCRIPT__'):
             if token in section:
                 raise ValueError(f'{name}功能模板尚未完成注入：{token}')
         blocks.append(portable_section(section,aliases or {}))
