@@ -168,21 +168,27 @@ def rank_layers(trace, origin, parents, events):
     for index, ((parent_id, role, number, scope), kernels) in enumerate(sorted(by_layer.items())):
         parent = parents[parent_id]
         phase = parent['phase']
-        if scope:
-            start, end = (value - origin for value in scope)
-            basis = '显式框架区间；设备算子按 torch_to_npu 关联' if kernels else '仅显式框架区间'
-        else:
+        if kernels:
             start = min(tick(event['start_us']) for event in kernels)
             end = max(tick(event['end_us']) for event in kernels)
-            basis = '已归层设备算子覆盖范围 · fwdbwd / Sequence number / torch_to_npu'
-        rows.append({
+            links = 'torch_to_npu' if phase == 'f' else 'fwdbwd / Sequence number / torch_to_npu'
+            basis = '已归层设备算子覆盖范围 · ' + links
+        else:
+            start, end = (value - origin for value in scope)
+            basis = '仅有 CPU 框架区间，缺少已归层设备算子'
+        marker = {
             'region_id': f'{parent_id}:layer:{index}', 'parent_region_id': parent_id,
             'start_us': us(start), 'end_us': us(end), 'duration_us': us(end - start),
             'rank': parent['rank'], 'stage': parent.get('stage'), 'step': parent['step'],
             'phase': phase, 'model_role': role, 'layer_number': number, 'label': f'L{number}{phase}',
             'basis': basis, 'kernel_count': len(kernels),
             'event_ids': [str(event['event_id']) for event in kernels],
-        })
+        }
+        if scope:
+            marker['framework_start_us'], marker['framework_end_us'] = (
+                us(value - origin) for value in scope
+            )
+        rows.append(marker)
     return rows
 
 

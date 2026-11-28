@@ -1,7 +1,67 @@
 """Optional offline HTML smoke check, deriving counts from this run rather than fixed samples."""
+from decimal import Decimal
+import json
 from pathlib import Path
 from workflow_support import load_json,write_json
 from parallel_domain_registry import DOMAINS
+
+
+def check_layer_bounds(root, layers, kernels):
+    for layer in layers:
+        events = [kernels[str(event_id)] for event_id in layer['event_ids']]
+        assert len(events) == layer['kernel_count']
+        if events:
+            assert Decimal(layer['start_us']) == min(Decimal(event['start_us']) for event in events), layer['label']
+            assert Decimal(layer['end_us']) == max(Decimal(event['end_us']) for event in events), layer['label']
+
+    chart = root.locator('[data-pp=chart]')
+    start = float(chart.get_attribute('data-view-start'))
+    end = float(chart.get_attribute('data-view-end'))
+    left = float(chart.get_attribute('data-left'))
+    width = float(chart.get_attribute('data-plot-width'))
+    pixels = {
+        key: (x, rect_width) for key, x, rect_width in chart.locator(
+            '[data-layer-region][visibility=visible]'
+        ).evaluate_all("nodes => nodes.map(n => [n.dataset.layerRegion, +n.getAttribute('x'), +n.getAttribute('width')])")
+    }
+    for layer in layers:
+        rendered = pixels.get(layer['region_id'])
+        if rendered is None:
+            continue
+        x, rect_width = rendered
+        bounds = [max(start, float(layer['start_us'])), min(end, float(layer['end_us']))]
+        expected = [left + (value - start) / (end - start) * width for value in bounds]
+        assert abs(x - expected[0]) < .01 and abs(x + rect_width - expected[1]) < .01, layer['label']
+
+
+def check_phase_options(root):
+    picker = root.locator('[data-pp=phase-picker]')
+    labels = picker.locator('.phase-options label').all_text_contents()
+    assert labels == ['1F/1B micro', 'L1F/L1B 层', 'R1 重计算', 'opt 优化器更新'], labels
+    count = root.locator('[data-pp=phase-label]')
+    assert count.inner_text() == '2/4'
+    chart = root.locator('[data-pp=chart]')
+    micro = chart.locator('rect[data-renderer=region-envelope]:is([data-phase=f],[data-phase=b])[visibility=visible]')
+    layers = chart.locator('[data-layer-region][visibility=visible]')
+    optimizer = chart.locator('rect[data-renderer=region-envelope][data-phase=opt][visibility=visible]')
+    initial = micro.count(), layers.count()
+    picker.locator('summary').click()
+    micro_input = picker.locator('input[data-phase=micro]')
+    layer_input = picker.locator('input[data-phase=layer]')
+    micro_input.uncheck()
+    assert (micro.count(), layers.count()) == (0, initial[1])
+    micro_input.check()
+    layer_input.uncheck()
+    assert (micro.count(), layers.count()) == (initial[0], 0)
+    picker.locator('[data-pp=phase-all]').click()
+    assert count.inner_text() == '4/4'
+    assert (micro.count(), layers.count()) == initial
+    picker.locator('[data-pp=phase-none]').click()
+    assert count.inner_text() == '0/4'
+    assert micro.count() == layers.count() == optimizer.count() == 0
+    micro_input.check()
+    layer_input.check()
+    picker.locator('summary').click()
 
 
 def check_operation_guide(root):
@@ -196,11 +256,16 @@ def check_html(html,output_dir):
         import ijson
         expected=0
         active_domains=set()
+        layers = json.loads(root.locator('#parallel-layer-data').text_content())
+        members = {str(event_id) for layer in layers for event_id in layer['event_ids']}
+        kernels = {}
         with (out/'unified_report.json').open('rb') as handle:
             options=next(ijson.items(handle,'analysis_options'),{})
             expected_streams=['communication'] if options.get('communication_only') else ['compute','communication','free']
             handle.seek(0)
             for event in ijson.items(handle,'events.item'):
+                event_id = str(event['event_id'])
+                if event_id in members:kernels[event_id] = event
                 if event['kind']=='communication':
                     active_domains.add(event.get('domain') or 'unresolved')
                     active_domains.update(event.get('domain_aliases',[]))
@@ -218,8 +283,10 @@ def check_html(html,output_dir):
         phases=root.locator('input[data-phase]:checked').evaluate_all('(items)=>items.map(e=>e.dataset.phase)')
         enabled=root.locator('input[data-domain]:enabled').evaluate_all('(items)=>items.map(e=>e.dataset.domain)')
         if set(checked)!=active_domains or set(enabled)!=active_domains:errors.append('可用通信域及默认选择不匹配')
-        if phases!=['f','b']:errors.append('默认标注应为f/b')
+        if phases!=['micro','layer']:errors.append('默认标注应为 micro 和层')
         root.screenshot(path=str(out/'browser.png'))
+        check_layer_bounds(root, layers, kernels)
+        check_phase_options(root)
         check_operation_guide(root)
         check_flag_interactions(page, root)
         browser.close()

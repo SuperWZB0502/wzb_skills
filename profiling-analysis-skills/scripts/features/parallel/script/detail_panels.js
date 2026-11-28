@@ -64,7 +64,12 @@ function renderSubject(target,subject,hover=false){target.replaceChildren();if(h
  if(isEvent&&subject.kind==='compute'){const record=recordFor(subject),ref=computeRefFor(subject);if(record){ioTable(target,record,'输入');ioTable(target,record,'输出');target.append(detailElement('p','来源：kernel_details.csv 第 '+ref[1]+' 行。','detail-note'));}target.append(detailElement('p',eventPerformance(subject).basis+'；MFU按本卡BF16/FP16模型峰值归一化，非硬件PMU利用率。','detail-note'));}
  if(isEvent&&subject.kind==='communication')renderCommunication(target,subject);
  if(stats)target.append(detailElement('p',performanceNote(stats),'detail-note'));
- if(isRegion&&subject.model_role)target.append(detailElement('p','已归层设备算子 '+subject.kernel_count+' 个 · '+subject.basis,'detail-note'));
+ if(isRegion&&subject.model_role){
+  target.append(detailElement('p','已归层设备算子 '+subject.kernel_count+' 个 · '+subject.basis,'detail-note'));
+  if(subject.kernel_count&&subject.framework_start_us!=null&&subject.framework_end_us!=null){
+   target.append(detailElement('p','CPU 框架区间 '+time(subject.framework_start_us)+' 至 '+time(subject.framework_end_us),'detail-note'));
+  }
+ }
  else if(isRegion&&subject.basis&&!hover)target.append(detailElement('p',subject.basis,'detail-note'));
  if(!subject&&!hover)target.append(detailElement('p','单击算子或计算标注查看详情；框选可复制Stage/Rank与时间区间。','detail-note'));
 }

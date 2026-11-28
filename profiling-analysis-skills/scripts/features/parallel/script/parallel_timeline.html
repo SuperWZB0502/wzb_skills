@@ -129,7 +129,7 @@
   <div class="picker-field"><span class="picker-caption">通信组</span><details class="stage-picker group-picker" data-pp="group-picker"><summary aria-label="通信组选择"><span data-pp="group-filter-label"></span> ▾</summary><div class="stage-options"><div class="stage-actions"><button data-pp="group-all">全选</button><button data-pp="group-none">清空</button></div><div data-pp="group-options"></div></div></details></div>
   <label>单位 <select data-pp="unit" aria-label="时间单位"><option value="s">秒（s）</option><option value="ms">毫秒（ms）</option><option value="us">微秒（μs）</option></select></label>
  <div class="picker-field"><span class="picker-caption">显示流</span><details class="stage-picker control-picker" data-pp="stream-picker"><summary aria-label="显示流选择"><span data-pp="stream-label"></span> ▾</summary><div class="stage-options"><div class="stage-actions"><button data-pp="stream-all">全选</button><button data-pp="stream-none">清空</button></div><div class="streams" data-pp="streams"><label><input type="checkbox" data-stream="compute" checked>计算</label><label><input type="checkbox" data-stream="communication" checked>通信</label><label><input type="checkbox" data-stream="copy">拷贝</label><label title="Overlap Analysis 原始Free；可能与拷贝重叠"><input type="checkbox" data-stream="free" checked>Free</label></div></div></details></div>
-  <div class="picker-field"><span class="picker-caption">显示标注</span><details class="stage-picker control-picker" data-pp="phase-picker"><summary aria-label="显示标注选择"><span data-pp="phase-label"></span> ▾</summary><div class="stage-options"><div class="stage-actions"><button data-pp="phase-all">全选</button><button data-pp="phase-none">清空</button></div><div class="phase-options"><label><input type="checkbox" data-phase="f" checked>1f 前向</label><label><input type="checkbox" data-phase="b" checked>1b 反向</label><label><input type="checkbox" data-phase="r">1r 逐层重计算</label><label><input type="checkbox" data-phase="opt">opt 优化器更新</label></div></div></details></div>
+  <div class="picker-field"><span class="picker-caption">显示标注</span><details class="stage-picker control-picker" data-pp="phase-picker"><summary aria-label="显示标注选择"><span data-pp="phase-label"></span> ▾</summary><div class="stage-options"><div class="stage-actions"><button data-pp="phase-all">全选</button><button data-pp="phase-none">清空</button></div><div class="phase-options"><label><input type="checkbox" data-phase="micro" checked>1F/1B micro</label><label><input type="checkbox" data-phase="layer" checked>L1F/L1B 层</label><label><input type="checkbox" data-phase="r">R1 重计算</label><label><input type="checkbox" data-phase="opt">opt 优化器更新</label></div></div></details></div>
   <div class="picker-field"><span class="picker-caption">通信域</span><details class="stage-picker control-picker" data-pp="domain-picker"><summary aria-label="通信域选择"><span data-pp="domain-label"></span> ▾</summary><div class="stage-options"><div class="stage-actions"><button type="button" data-pp="domain-all">全选</button><button type="button" data-pp="domain-none">清空</button></div><div class="domains" data-pp="domains"></div></div></details></div>
   <label>图中名称 <input data-pp="search" aria-label="图中名称搜索" placeholder="搜索事件名称"></label>
   <div class="toolbar-actions"><button class="primary" data-pp="guide-toggle" aria-expanded="false" aria-controls="parallel-operation-guide">操作指南</button><button class="primary" data-pp="download">导出筛选CSV</button></div>
@@ -242,7 +242,7 @@ const overviewColumns=[['stage','Stage'],['rank','卡号'],['count','总事件�
 let page=1,visible=[],filtered=[],baseEvents=[],sortKey='stage',direction=1,selectedId=null,selectedRegionId=null,selectedFlowId=null,boxEventIds=null,rangeSelection=null,viewMode='overview',fullStart=0,fullEnd=1,viewStart=0,viewEnd=1,targetStart=0,targetEnd=1,scene=null,frame=0,lastFrame=0,lastTable=0,drag=null,suppressClick=false,pointerX=null,pointerY=null,pointerInside=false,zoomDirection=null,zoomHeldSince=0,zoomAnchor=null,zoomRate=0,locationInfo=null,zoomFocus=null,zoomHistory=[];
 const availableDomains=new Set();
 for(const event of data.events){if(event.kind==='communication')for(const name of eventDomains(event))if(domainNames.includes(name))availableDomains.add(name);}
-const graphRanks=new Set(ranks),selectedRanks=new Set(ranks),selectedGroups=new Set((data.groups||[]).map(g=>String(g.group_id))),keys=new Set(),selectedKinds=new Set(),selectedDomains=new Set(availableDomains),selectedPhases=new Set(['f','b']);
+const graphRanks=new Set(ranks),selectedRanks=new Set(ranks),selectedGroups=new Set((data.groups||[]).map(g=>String(g.group_id))),keys=new Set(),selectedKinds=new Set(),selectedDomains=new Set(availableDomains),selectedPhases=new Set(['micro','layer']);
 const display=v=>(Number(v)/scales[q('unit').value]).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),time=v=>display(v)+' '+symbols[q('unit').value];
 function stageOf(rank){return stageLookup.get(Number(rank))??null;}
 function opType(e){return e.kind==='communication'?e.name.split('__')[0]:(e.op_type||e.category||e.kind);}
@@ -415,9 +415,9 @@ function makeScene(){
  for(const region of phaseRegions){
   if(String(region.step)!==q('step').value)continue;
   const replays=selectedPhases.has('r')?(recomputeByParent.get(region.region_id)||[]):[];
-  if(!selectedPhases.has(region.phase)&&!replays.length)continue;
   const row=rowMap.get(Number(region.rank)),lane=row?.lanes.compute||row?.lanes.communication;if(!lane)continue;
-  const layerItems=row.lanes.compute&&selectedPhases.has(region.phase)?layersByParent.get(region.region_id)||[]:[];
+  const layerItems=row.lanes.compute&&selectedPhases.has('layer')?layersByParent.get(region.region_id)||[]:[];
+  if(!parentPhaseSelected(region)&&!layerItems.length&&!replays.length)continue;
   const hasChildren=replays.length||layerItems.length;
   const start=Number(region.display_start_us??region.start_us),end=Number(region.display_end_us??region.end_us);if(!(end>start))continue;
   const ry=row.lanes.compute?lane.y:lane.eventY,phaseHeight=(layerItems.length?(replays.length?30:24):17)*verticalScale,rect=svg('rect',{y:ry,height:phaseHeight,rx:2,fill:'#e6e9ed','data-compute-region':region.region_id,'data-phase':region.phase,'data-renderer':'region-envelope',tabindex:0,role:'button','aria-label':region.label+' Stage '+region.stage+' '+region.phase}),label=svg('text',{y:ry+(hasChildren?4:phaseHeight/2),fill:'#737e8b','font-size':hasChildren?8:10,'text-anchor':'middle','dominant-baseline':'central','data-compute-label':region.region_id,'pointer-events':'all',tabindex:0,role:'button','aria-label':region.label+' Stage '+region.stage+' '+region.phase,'paint-order':'stroke',stroke:'white','stroke-width':hasChildren ? 0.2 : 2,cursor:'pointer'});
@@ -447,7 +447,39 @@ function makeScene(){
  const selectionMask=svg('mask',{id:'pps-selection-mask',maskUnits:'userSpaceOnUse',x:0,y:0,width,height:y+12});selectionMask.append(svg('rect',{width,height:y+12,fill:'white'}));defs.append(selectionMask);scene.selectionMask=selectionMask;scene.maskLayer=svg('g',{'data-pp':'selection-mask','pointer-events':'none',visibility:'hidden'});scene.maskLayer.append(svg('rect',{x:left,y:laneTop,width:plot,height:y-laneTop,fill:'#344052','fill-opacity':.38,mask:'url(#pps-selection-mask)'}));chart.append(scene.maskLayer);
  scene.startLine=svg('line',{'data-pp':'selection-start-line',y1:laneTop,y2:y,stroke:'#2783f3','stroke-dasharray':'4 4','stroke-width':1,'pointer-events':'none',visibility:'hidden'});scene.endLine=svg('line',{'data-pp':'selection-end-line',y1:laneTop,y2:y,stroke:'#2783f3','stroke-dasharray':'4 4','stroke-width':1,'pointer-events':'none',visibility:'hidden'});scene.duration=svg('g',{'pointer-events':'none',visibility:'hidden'});scene.durationLine=svg('path',{stroke:'#253c53','stroke-width':1,fill:'none'});scene.durationText=svg('text',{'data-pp':'range-duration','text-anchor':'middle',fill:'#253c53','font-size':11,'paint-order':'stroke',stroke:'white','stroke-width':4});scene.duration.append(scene.durationLine,scene.durationText);scene.crosshair=svg('line',{'data-pp':'crosshair',y1:flagTop,y2:y,stroke:'#536b83','stroke-dasharray':'4 4','stroke-width':1,'pointer-events':'none',visibility:'hidden'});scene.crosshairText=svg('text',{'data-pp':'crosshair-time',y:axisRowHeight-1,fill:'#536b83','font-size':10,'text-anchor':'middle','paint-order':'stroke',stroke:'white','stroke-width':3,'pointer-events':'none',visibility:'hidden'});scene.dragBox=svg('rect',{'data-pp':'drag-box',fill:'none',stroke:'#2783f3','stroke-width':1,visibility:'hidden','pointer-events':'none'});chart.append(scene.flagGuides,scene.startLine,scene.endLine,scene.dragBox,scene.duration,scene.flagTrack,scene.crosshair,scene.crosshairText);updateViewport();highlightSelection();
 }
-function drawCompute(){if(!scene)return;const span=viewEnd-viewStart,x=t=>scene.left+(t-viewStart)/span*scene.plot;for(const r of scene.regions){const left=Math.max(scene.left,x(r.start)),right=Math.min(scene.left+scene.plot,x(r.end)),shown=right>left,parentShown=shown&&selectedPhases.has(r.region.phase);r.rect.setAttribute('x',left);r.rect.setAttribute('width',Math.max(0,right-left));r.rect.setAttribute('visibility',parentShown?'visible':'hidden');r.rect.setAttribute('tabindex',parentShown?'0':'-1');const caption=fitLabel(r.region.label,right-left-4,r.nested.length?'8px system-ui':'10px system-ui');r.label.textContent=caption;r.label.setAttribute('x',(left+right)/2);r.label.setAttribute('visibility',parentShown&&caption?'visible':'hidden');r.label.setAttribute('tabindex',parentShown&&caption?'0':'-1');for(const n of r.nested){const a=Math.max(left,x(n.start)),b=Math.min(right,x(n.end)),visible=shown&&b>a;n.rect.setAttribute('visibility',visible?'visible':'hidden');n.rect.setAttribute('x',a);n.rect.setAttribute('width',Math.max(0,b-a));n.label.textContent=fitLabel(n.caption||n.region.label,b-a-2,n.caption?'9px system-ui':'8px system-ui');n.label.setAttribute('x',(a+b)/2);n.label.setAttribute('visibility',visible&&n.label.textContent?'visible':'hidden');}}}
+function parentPhaseSelected(region){
+ return selectedPhases.has(region.phase==='f'||region.phase==='b'?'micro':region.phase);
+}
+function drawCompute(){
+ if(!scene)return;
+ const edge=scene.left+scene.plot;
+ const x=t=>scene.left+(t-viewStart)/(viewEnd-viewStart)*scene.plot;
+ for(const r of scene.regions){
+  const left=Math.max(scene.left,x(r.start)),right=Math.min(edge,x(r.end)),shown=right>left;
+  const parentShown=shown&&parentPhaseSelected(r.region);
+  r.rect.setAttribute('x',left);
+  r.rect.setAttribute('width',Math.max(0,right-left));
+  r.rect.setAttribute('visibility',parentShown?'visible':'hidden');
+  r.rect.setAttribute('tabindex',parentShown?'0':'-1');
+  const caption=fitLabel(r.region.label,right-left-4,r.nested.length?'8px system-ui':'10px system-ui');
+  r.label.textContent=caption;
+  r.label.setAttribute('x',(left+right)/2);
+  r.label.setAttribute('visibility',parentShown&&caption?'visible':'hidden');
+  r.label.setAttribute('tabindex',parentShown&&caption?'0':'-1');
+  for(const n of r.nested){
+   const isLayer=Boolean(n.region.model_role);
+   const a=Math.max(isLayer?scene.left:left,x(n.start)),b=Math.min(isLayer?edge:right,x(n.end));
+   const visible=(isLayer?selectedPhases.has('layer'):shown)&&b>a;
+   n.rect.setAttribute('visibility',visible?'visible':'hidden');
+   if(isLayer)n.rect.setAttribute('tabindex',visible?'0':'-1');
+   n.rect.setAttribute('x',a);
+   n.rect.setAttribute('width',Math.max(0,b-a));
+   n.label.textContent=fitLabel(n.caption||n.region.label,b-a-2,n.caption?'9px system-ui':'8px system-ui');
+   n.label.setAttribute('x',(a+b)/2);
+   n.label.setAttribute('visibility',visible&&n.label.textContent?'visible':'hidden');
+  }
+ }
+}
 function drawCanvas(){
  if(!scene)return;const canvas=scene.canvas,dpr=Math.min(2,window.devicePixelRatio||1),height=Math.max(1,scene.height-plotTop-12);if(canvas.width!==Math.round(scene.plot*dpr)||canvas.height!==Math.round(height*dpr)){canvas.width=Math.round(scene.plot*dpr);canvas.height=Math.round(height*dpr);}const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,scene.plot,height);scene.canvasHits.clear();let individual=0,aggregateCount=0,visibleHardware=0;const span=viewEnd-viewStart;
  for(const row of scene.layouts)for(const kind of ['compute','copy','free']){const lane=row.lanes[kind],key=row.rank+'|'+kind,index=scene.hardwareIndexes.get(key);if(!lane||!index)continue;const events=queryIndex(index,viewStart,viewEnd),buckets=new Map(),hits=[];for(const e of events){if(!overlaps(e))continue;visibleHardware++;const start=(e._start-viewStart)/span*scene.plot,end=(e._end-viewStart)/span*scene.plot,left=Math.max(0,start),right=Math.min(scene.plot,end),width=right-left;if(width<=0)continue;if(width<2){const at=Math.max(0,Math.min(Math.floor(scene.plot)-1,Math.floor((left+right)/2))),bucket=buckets.get(at)||{x:at,width:1.2,y:lane.eventY,height:lane.eventHeight,count:0,aggregate:true,rank:row.rank,kind,colors:new Map(),start:Infinity,end:-Infinity};bucket.count++;const fill=color(e.name);bucket.colors.set(fill,(bucket.colors.get(fill)||0)+1);bucket.start=Math.min(bucket.start,e._start);bucket.end=Math.max(bucket.end,e._end);buckets.set(at,bucket);continue;}

@@ -6,7 +6,7 @@
     {
       "packaged": "scripts/features/parallel/script/layer_markers.py",
       "source": "skill-local",
-      "sha256": "9a38c3bf2784eb3ad50a3316000499d38fe86f82e426e0d2a41ebe6fd48be613"
+      "sha256": "f61c1865adbd76c561461ba4970d1e4a33bd12a02ca7343e474eed4878151f70"
     },
     {
       "packaged": "scripts/features/parallel/script/mindstudio_timeline.json",
@@ -126,7 +126,7 @@
     {
       "packaged": "scripts/features/parallel/script/browser_check.py",
       "source": "msinsight调研/功能02_5D并行通信图/script/browser_check.py",
-      "sha256": "6f9a04533b2491c23935a16d8eb905105b2d31a8bf69710277215403d2b36c82"
+      "sha256": "db9f2fe9bf6140c579ada0db6f0b755de8b9fc85f1738778b22c91fb5acde661"
     },
     {
       "packaged": "scripts/features/parallel/script/compact_timeline.js",
@@ -141,7 +141,7 @@
     {
       "packaged": "scripts/features/parallel/script/detail_panels.js",
       "source": "msinsight调研/功能02_5D并行通信图/script/detail_panels.js",
-      "sha256": "c8cdfc45b4ec21e96837e639ab4cbe8501f5de87c3fb9c5c40111209cac6b1bf"
+      "sha256": "e374b4a877d236d07a5e905f202ddf4ed355a79e8c179fb05602e44365f3d898"
     },
     {
       "packaged": "scripts/features/parallel/script/domain_trace.py",
@@ -206,7 +206,7 @@
     {
       "packaged": "scripts/features/parallel/script/parallel_timeline.html",
       "source": "msinsight调研/功能02_5D并行通信图/script/parallel_timeline.html",
-      "sha256": "0ea2616a36a376292a500a1b39de5e08ba4846cc867340141bed4d5c887f55af"
+      "sha256": "2f27e4b7eb7b53e84cb496ed62ab161b69bd918b136a08d2a507a48900636ab2"
     },
     {
       "packaged": "scripts/features/parallel/script/parallel_workers.py",
